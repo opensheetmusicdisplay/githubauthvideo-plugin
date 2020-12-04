@@ -18,8 +18,8 @@
  * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/applying-styles-with-stylesheets/
  */
 
-include 'settings.php';
-include 'post_type.php';
+include 'plugin_bootstrapping/settings.php';
+include 'plugin_bootstrapping/post_type.php';
 
 function phonicscore_githubauthvideo_block_init() {
 	$dir = dirname( __FILE__ );
@@ -63,3 +63,28 @@ function phonicscore_githubauthvideo_block_init() {
 	) );
 }
 add_action( 'init', 'phonicscore_githubauthvideo_block_init' );
+/*
+add_action( 'parse_request', function( $wp ){
+	var_dump($wp);
+	exit;
+    if ( preg_match( '#^github_auth/?#', $wp->request, $matches ) ) {
+        //$leaf = $matches[1];
+
+        // Load your file - make sure the path is correct.
+        include_once plugin_dir_path( __FILE__ ) . 'githubauthvideo-plugin/authentication/auth.php';
+
+        exit; // and exit
+    }
+} );
+*/
+
+function register_rewrite_rule_init() {
+	//flush_rewrite_rules();
+	$plugin_url = plugins_url( 'githubauthvideo-plugin/authentication/auth.php', __FILE__ );
+	add_rewrite_rule('^github_auth/?', $plugin_url, 'top');
+	flush_rewrite_rules(false);
+}
+
+add_action( 'init',  'register_rewrite_rule_init' );
+
+?>
