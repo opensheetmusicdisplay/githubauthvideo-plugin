@@ -76,26 +76,11 @@ registerBlockType( 'phonicscore/githubauthvideo', {
 	/**
 	 * @see ./save.js
 	 */
-	save,
+	save: () => { return null },
 
 	attributes: {
-		width: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'video',
-			attribute: 'width'
-		},
-		height: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'video',
-			attribute: 'height'
-		},
 		videoId: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'input.videoId',
-			attribute: 'value'
+			type: 'string'
 		}
 	}
 } );
