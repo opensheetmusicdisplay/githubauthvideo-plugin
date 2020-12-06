@@ -63222,7 +63222,6 @@ function Edit(_ref) {
       className = _ref.className,
       setAttributes = _ref.setAttributes;
   var classes = 'video-js ' + className;
-  console.log(js_cookie__WEBPACK_IMPORTED_MODULE_4___default.a.get());
   return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])("div", null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__["BlockSettingsMenuControls"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__["TextControl"], {
     label: "Video ID",
     value: attributes.videoId,
@@ -63349,25 +63348,12 @@ Object(_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__["registerBlockType"])('pho
   /**
    * @see ./save.js
    */
-  save: _save__WEBPACK_IMPORTED_MODULE_4__["default"],
+  save: function save() {
+    return null;
+  },
   attributes: {
-    width: {
-      type: 'string',
-      source: 'attribute',
-      selector: 'video',
-      attribute: 'width'
-    },
-    height: {
-      type: 'string',
-      source: 'attribute',
-      selector: 'video',
-      attribute: 'height'
-    },
     videoId: {
-      type: 'string',
-      source: 'attribute',
-      selector: 'input.videoId',
-      attribute: 'value'
+      type: 'string'
     }
   }
 });

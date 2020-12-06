@@ -64,64 +64,65 @@
         header("Location: " . $url);
         die();        
         exit;
-    }
+    } else { //Else, code query param is set. Coming back from Github
+        const CODE = $_GET['code'];
 
-    const CODE = $_GET['code'];
-
-    if(!isset($_GET('state'))){
-        echo '"state" query parameter must be populated.';
-        exit;
-    }
-    const STATE = $_GET['state'];
-    try {
-        //Verify the state provided (JWT Token)
-        $stateToken = $config->parser()->parse(STATE);
-        assert($stateToken instanceof Plain);
-    } catch(Exception e){
-        echo 'Error validating state param. Authentication failed.';
-        exit;
-    }
-
-    if (! $config->validator()->validate($stateToken, new IssuedBy($_SERVER['HTTP_HOST']))) {
-        echo 'State JWT was not properly validated. Authentication failed.';
-        exit;
-    }
-
-    //Extra security since our state variable is not random
-    //This is a fairly good way of mitigating third-party interference
-    $stateTokenAgentClaim = $stateToken->claims().get('user_agent', '');
-    $stateTokenIpClaim = $stateToken->claims().get('ip', '');
-
-    if ($stateTokenAgentClaim != $_SERVER['HTTP_USER_AGENT'] || $stateTokenIpClaim != $_SERVER['REMOTE_ADDR']) {
-        echo 'User agent or IP address do not match state token claim. Authentication failed.';
-        exit;
-    }
-
-    $url = 'https://github.com/login/oauth/access_token';
-    $data = array('client_id' => CLIENT_ID, 'client_secret' => CLIENT_SECRET,
-                    'code' => CODE, 'state' => STATE, 'redirect_uri' => REDIRECT_URI);
+        if(!isset($_GET('state'))){
+            echo '"state" query parameter is missing. Authentication failed.';
+            exit;
+        }
+        const STATE = $_GET['state'];
+        try {
+            //Verify the state provided (JWT Token)
+            $stateToken = $config->parser()->parse(STATE);
+            assert($stateToken instanceof Plain);
+        } catch(Exception e){
+            echo 'Error validating state. Authentication failed.';
+            exit;
+        }
     
-    // use key 'http' even if you send the request to https://...
-    $options = array(
-        'http' => array(
-            'header'  => array("Content-type: application/json",
-                                "Accept: application/json"),
-            'method'  => 'POST',
-            'content' => json_encode($data)
-        )
-    );
-    $context  = stream_context_create($options);
-    $result = json_decode(file_get_contents($url, false, $context), true);
-    if ($result === FALSE) {
-        echo 'error retrieving access token.';
-        exit;
-    } else {
-        $returnPathFromToken = $stateToken->claims().get('return_path', '/'); // Retrieves the return path
-        setcookie('githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token', $result['access_token'], 
-                  time()+60*60*24*1, '/', '', true);
-        setcookie('githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token_type', $result['token_type'], 
-                  time()+60*60*24*1, '/', '', true);
-        header('Location: ' . $returnPathFromToken);
-        die();
+        if (! $config->validator()->validate($stateToken, new IssuedBy($_SERVER['HTTP_HOST']))) {
+            echo 'State was not issued by this server. Authentication failed.';
+            exit;
+        }
+    
+        //Extra security since our state variable is not random
+        //This is a fairly good way of mitigating third-party interference
+        $stateTokenAgentClaim = $stateToken->claims().get('user_agent', '');
+        $stateTokenIpClaim = $stateToken->claims().get('ip', '');
+    
+        if ($stateTokenAgentClaim != $_SERVER['HTTP_USER_AGENT'] || $stateTokenIpClaim != $_SERVER['REMOTE_ADDR']) {
+            echo 'User agent or IP address do not match state token claim. Authentication failed.';
+            exit;
+        }
+    
+        $url = 'https://github.com/login/oauth/access_token';
+        $data = array('client_id' => CLIENT_ID, 'client_secret' => CLIENT_SECRET,
+                        'code' => CODE, 'state' => STATE, 'redirect_uri' => REDIRECT_URI);
+        
+        // use key 'http' even if you send the request to https://...
+        $options = array(
+            'http' => array(
+                'header'  => array("Content-type: application/json",
+                                    "Accept: application/json"),
+                'method'  => 'POST',
+                'content' => json_encode($data)
+            )
+        );
+        $context  = stream_context_create($options);
+        $result = json_decode(file_get_contents($url, false, $context), true);
+        if ($result === FALSE) {
+            echo 'error retrieving access token.';
+            exit;
+        } else {
+            $returnPathFromToken = $stateToken->claims().get('return_path', '/'); // Retrieves the return path
+            setcookie('githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token', $result['access_token'], 
+                      time()+60*60*24*1, '/', '', true);
+            setcookie('githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token_type', $result['token_type'], 
+                      time()+60*60*24*1, '/', '', true);
+            header('Location: ' . $returnPathFromToken);
+            die();
+        }
     }
+    
 ?>

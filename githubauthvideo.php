@@ -24,11 +24,6 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 include 'plugin_bootstrapping/settings.php';
 include 'plugin_bootstrapping/post_type.php';
 
-//Determines what's rendered in WP.
-function phonicscore_githubauthvideo_block_render_callback($block_attributes, $content) {
-	return var_dump($block_attributes);
-}
-
 function phonicscore_githubauthvideo_block_init() {
 	$dir = dirname( __FILE__ );
 
@@ -71,6 +66,30 @@ function phonicscore_githubauthvideo_block_init() {
 		'render_callback' => 'phonicscore_githubauthvideo_block_render_callback'
 	) );
 }
+
+//Determines what's rendered in WP.
+function phonicscore_githubauthvideo_block_render_callback($block_attributes, $content) {
+	echo '<div>' . var_dump($block_attributes) . '</div>';
+	return $content; 
+	//Check for cookies
+	//If cookies present, render video
+	$token = $_COOKIE['githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token'];
+	if (!isset($token)){
+		//Blurred video with auth link
+	} else {
+		$tokenType = 'bearer';
+		$tokenTypeCookie = $_COOKIE['githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token_type'];
+		if(isset($tokenTypeCookie)){
+			$tokenType = $tokenTypeCookie;
+		}
+		$videoUrl = 'github_auth_video?access_token=' . $token . '&token_type=' . $tokenType;
+		echo $videoUrl;
+		exit;
+	}
+	//If cookies not present, render blurred video with auth link
+	//Auth link navigates to github_auth with a 'return_path' query param (the current path)
+}
+
 add_action( 'init', 'phonicscore_githubauthvideo_block_init' );
 
 add_action( 'parse_request', function( $wp ){

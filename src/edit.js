@@ -30,7 +30,6 @@ import './editor.scss';
  */
 export default function Edit( {attributes, className, setAttributes} ) {
 	let classes = 'video-js ' + className;
-	console.log(Cookies.get());
 	return (
 		<div>
 			{
