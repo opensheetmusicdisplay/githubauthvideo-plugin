@@ -1,5 +1,7 @@
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import { TextControl } from '@wordpress/components';
+import  * as videojs  from 'video.js';
+import Cookies from 'js-cookie';
 /**
  * Retrieves the translation of text.
  *
@@ -27,6 +29,8 @@ import './editor.scss';
  * @return {WPElement} Element to render.
  */
 export default function Edit( {attributes, className, setAttributes} ) {
+	let classes = 'video-js ' + className;
+	console.log(Cookies.get());
 	return (
 		<div>
 			{
@@ -37,25 +41,11 @@ export default function Edit( {attributes, className, setAttributes} ) {
 						onChange={ ( val ) => setAttributes( { videoId: val } ) }
 					>
 					</TextControl>
-					<TextControl
-						label="Github Organization ID"
-						value={ attributes.organizationId }
-						onChange={ ( val ) => setAttributes( { organizationId: val } ) }
-					>
-					</TextControl>
-					<TextControl
-						label="Github Sponsorship Tier ID"
-						value={ attributes.tierId }
-						onChange={ ( val ) => setAttributes( { tierId: val } ) }
-					>
-					</TextControl>
 				</BlockSettingsMenuControls>
 			}
-			<input type="hidden" className="organizationId" value = { attributes.organizationId }></input>
-			<input type="hidden" className="tierId" value = { attributes.tierId }></input>
 			<input type="hidden" className="videoId" value = { attributes.videoId }></input>
-			<video className={ className } width={ attributes.width } height={ attributes.height } >
-				<source></source>
+			<video className={ classes } width={ attributes.width } height={ attributes.height } >
+				<source src={"github_auth_video?=" + attributes.videoId}></source>
 			</video>
 		</div>
 	);

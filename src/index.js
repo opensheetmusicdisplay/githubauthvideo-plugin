@@ -96,18 +96,6 @@ registerBlockType( 'phonicscore/githubauthvideo', {
 			source: 'attribute',
 			selector: 'input.videoId',
 			attribute: 'value'
-		},
-		organizationId: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'input.organizationId',
-			attribute: 'value'
-		},
-		tierId: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'input.tierId',
-			attribute: 'value'
 		}
 	}
 } );

@@ -71,6 +71,14 @@ class GithubVideoAuthMainSettings {
 			'main-settings-admin', // page
 			'main_settings_setting_section' // section
 		);
+
+		add_settings_field(
+			'jwt_private_key_2', // id
+			'Private Key For Session Generation', // title
+			array( $this, 'jwt_private_key_2_callback' ), // callback
+			'main-settings-admin', // page
+			'main_settings_setting_section' // section
+		);
 	}
 
 	public function main_settings_sanitize($input) {
@@ -83,6 +91,9 @@ class GithubVideoAuthMainSettings {
 			$sanitary_values['github_app_client_secret_1'] = sanitize_text_field( $input['github_app_client_secret_1'] );
 		}
 
+		if ( isset( $input['jwt_private_key_2'] ) ) {
+			$sanitary_values['jwt_private_key_2'] = sanitize_text_field( $input['jwt_private_key_2'] );
+		}
 		return $sanitary_values;
 	}
 
@@ -104,6 +115,13 @@ class GithubVideoAuthMainSettings {
 		);
 	}
 
+	public function jwt_private_key_2_callback() {
+		printf(
+			'<input class="regular-text" type="text" name="main_settings_option_name[jwt_private_key_2]" id="jwt_private_key_2" value="%s">',
+			isset( $this->main_settings_options['jwt_private_key_2'] ) ? esc_attr( $this->main_settings_options['jwt_private_key_2']) : ''
+		);
+	}
+
 }
 if ( is_admin() )
 	$main_settings = new GithubVideoAuthMainSettings();
@@ -113,6 +131,7 @@ if ( is_admin() )
  * $main_settings_options = get_option( 'main_settings_option_name' ); // Array of All Options
  * $github_app_client_id_0 = $main_settings_options['github_app_client_id_0']; // Github App Client ID
  * $github_app_client_secret_1 = $main_settings_options['github_app_client_secret_1']; // Github App Client Secret
+ * $jwt_private_key_2 = $main_settings_options['jwt_private_key_2']; // Private Key For Session Generation
  */
 
  ?>

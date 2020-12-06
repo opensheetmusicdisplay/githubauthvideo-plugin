@@ -69,12 +69,12 @@ function githubauthvideo_register_post_type() {
  * https://jeremyhixon.com/tool/wordpress-meta-box-generator/
  * 
  * Retrieving the values:
- * Video Location URL = get_post_meta( get_the_ID(), 'githubauthvideo_video-location-url', true )
- * Video Location Server Path = get_post_meta( get_the_ID(), 'githubauthvideo_video-location-server-path', true )
- * Is URL Video = get_post_meta( get_the_ID(), 'githubauthvideo_is-url-video', true )
+ * Video Location URI = get_post_meta( get_the_ID(), 'githubauthvideo_video-location-uri', true )
+ * Github Organization ID = get_post_meta( get_the_ID(), 'githubauthvideo_github-organization-id', true )
+ * Github Sponsorship Tier ID = get_post_meta( get_the_ID(), 'githubauthvideo_github-sponsorship-tier-id', true )
  */
 class Github_Video_Entry_Fields {
-	private $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["post"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"url","label":"Video Location URL","id":"githubauthvideo_video-location-url"},{"type":"text","label":"Video Location Server Path","id":"githubauthvideo_video-location-server-path"},{"type":"checkbox","label":"Is URL Video","description":"Specifies whether the video is at the URL or on the local server","checked":"1","id":"githubauthvideo_is-url-video"}]}';
+	private $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["post"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"url","label":"Video Location URI","id":"githubauthvideo_video-location-uri"},{"type":"text","label":"Github Organization ID","id":"githubauthvideo_github-organization-id"},{"type":"text","label":"Github Sponsorship Tier ID","default":"*","id":"githubauthvideo_github-sponsorship-tier-id"}]}';
 
 	public function __construct() {
 		$this->config = json_decode( $this->config, true );
@@ -118,9 +118,6 @@ class Github_Video_Entry_Fields {
 	public function save_post( $post_id ) {
 		foreach ( $this->config['fields'] as $field ) {
 			switch ( $field['type'] ) {
-				case 'checkbox':
-					update_post_meta( $post_id, $field['id'], isset( $_POST[ $field['id'] ] ) ? $_POST[ $field['id'] ] : '' );
-					break;
 				case 'url':
 					if ( isset( $_POST[ $field['id'] ] ) ) {
 						$sanitized = esc_url_raw( $_POST[ $field['id'] ] );
@@ -166,21 +163,9 @@ class Github_Video_Entry_Fields {
 
 	private function field( $field ) {
 		switch ( $field['type'] ) {
-			case 'checkbox':
-				$this->checkbox( $field );
-				break;
 			default:
 				$this->input( $field );
 		}
-	}
-
-	private function checkbox( $field ) {
-		printf(
-			'<label class="rwp-checkbox-label"><input %s id="%s" name="%s" type="checkbox"> %s</label>',
-			$this->checked( $field ),
-			$field['id'], $field['id'],
-			isset( $field['description'] ) ? $field['description'] : ''
-		);
 	}
 
 	private function input( $field ) {
@@ -206,19 +191,6 @@ class Github_Video_Entry_Fields {
 		return str_replace( '\u0027', "'", $value );
 	}
 
-	private function checked( $field ) {
-		global $post;
-		if ( metadata_exists( 'post', $post->ID, $field['id'] ) ) {
-			$value = get_post_meta( $post->ID, $field['id'], true );
-			if ( $value === 'on' ) {
-				return 'checked';
-			}
-			return '';
-		} else if ( isset( $field['checked'] ) ) {
-			return 'checked';
-		}
-		return '';
-	}
 }
 new Github_Video_Entry_Fields;
 ?>

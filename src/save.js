@@ -14,15 +14,6 @@ import { __ } from '@wordpress/i18n';
  *
  * @return {WPElement} Element to render.
  */
-export default function save( {attributes, className, setAttributes} ) {
-	return (
-		<div>
-			<input type="hidden" className="organizationId" value = { attributes.organizationId }></input>
-			<input type="hidden" className="tierId" value = { attributes.tierId }></input>
-			<input type="hidden" className="videoId" value = { attributes.videoId }></input>
-			<video className={ className } width={ attributes.width } height={ attributes.height } >
-				<source></source>
-			</video>
-		</div>
-	);
+export default function save() {
+	return null;
 }

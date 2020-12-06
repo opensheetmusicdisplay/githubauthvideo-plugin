@@ -1,4 +1,7 @@
 <?php
+if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
+	require __DIR__ . '/vendor/autoload.php';
+}
 /**
  * Plugin Name:     Github Authenticated Video
  * Description:     Video that is behind github oauth prompt. Checks for sponsorship
@@ -20,6 +23,11 @@
 
 include 'plugin_bootstrapping/settings.php';
 include 'plugin_bootstrapping/post_type.php';
+
+//Determines what's rendered in WP.
+function phonicscore_githubauthvideo_block_render_callback($block_attributes, $content) {
+	return var_dump($block_attributes);
+}
 
 function phonicscore_githubauthvideo_block_init() {
 	$dir = dirname( __FILE__ );
@@ -60,31 +68,22 @@ function phonicscore_githubauthvideo_block_init() {
 		'editor_script' => 'phonicscore-githubauthvideo-block-editor',
 		'editor_style'  => 'phonicscore-githubauthvideo-block-editor',
 		'style'         => 'phonicscore-githubauthvideo-block',
+		'render_callback' => 'phonicscore_githubauthvideo_block_render_callback'
 	) );
 }
 add_action( 'init', 'phonicscore_githubauthvideo_block_init' );
-/*
+
 add_action( 'parse_request', function( $wp ){
-	var_dump($wp);
-	exit;
-    if ( preg_match( '#^github_auth/?#', $wp->request, $matches ) ) {
-        //$leaf = $matches[1];
-
-        // Load your file - make sure the path is correct.
-        include_once plugin_dir_path( __FILE__ ) . 'githubauthvideo-plugin/authentication/auth.php';
-
+	$uri = $_SERVER['REQUEST_URI'];
+    if ( preg_match( '/github_auth/', $uri ) ) {
+        // If we match, means we have a github oauth callback
+        include_once plugin_dir_path( __FILE__ ) . 'authentication/auth.php';
+        exit; // and exit
+    } else if ( preg_match( '/github_auth_video/', $uri ) ) {
+        // If we match, means we have a github oauth callback
+        include_once plugin_dir_path( __FILE__ ) . 'authentication/serve-video.php';
         exit; // and exit
     }
 } );
-*/
-
-function register_rewrite_rule_init() {
-	//flush_rewrite_rules();
-	$plugin_url = plugins_url( 'githubauthvideo-plugin/authentication/auth.php', __FILE__ );
-	add_rewrite_rule('^github_auth/?', $plugin_url, 'top');
-	flush_rewrite_rules(false);
-}
-
-add_action( 'init',  'register_rewrite_rule_init' );
 
 ?>
