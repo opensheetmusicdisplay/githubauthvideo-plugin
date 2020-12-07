@@ -26,7 +26,7 @@ function githubauthvideo_register_post_type() {
 		'show_ui'             => true,
 		'show_in_nav_menus'   => false,
 		'show_in_admin_bar'   => true,
-		'show_in_rest'        => false,
+		'show_in_rest'        => true,
 		'capability_type'     => 'post',
 		'hierarchical'        => false,
 		'has_archive'         => true,

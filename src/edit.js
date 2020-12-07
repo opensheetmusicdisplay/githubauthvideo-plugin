@@ -1,11 +1,11 @@
-import { BlockSettingsMenuControls } from '@wordpress/block-editor';
-import { TextControl } from '@wordpress/components';
-import  * as videojs  from 'video.js';
-import Cookies from 'js-cookie';
+import { InspectorControls } from '@wordpress/block-editor';
+import { SelectControl } from '@wordpress/components';
+import { withSelect } from "@wordpress/data";
+//import { SelectVideoControl } from "./SelectVideoControl";
 /**
  * Retrieves the translation of text.
  *
- * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
+ * @see https://developer.worSelectVideoControldpress.org/block-editor/packages/packages-i18n/
  */
 import { __ } from '@wordpress/i18n';
 
@@ -28,24 +28,39 @@ import './editor.scss';
  *
  * @return {WPElement} Element to render.
  */
-export default function Edit( {attributes, className, setAttributes} ) {
-	let classes = 'video-js ' + className;
+const Edit = ( {attributes, postList, className, setAttributes} ) => {
+	let postSelection = [{label: "Loading...", value: -1}];
+	if(postList && postList.length > 0){
+		postSelection = postList.map((value, index, array) => {
+			return {label: value.title.raw, value: value.id};
+		});
+	}
 	return (
-		<div>
+		<div className={ className }>
 			{
-				<BlockSettingsMenuControls>
-					<TextControl
-						label="Video ID"
+				<InspectorControls>
+					<SelectControl
+						label="Select Video"
 						value={ attributes.videoId }
 						onChange={ ( val ) => setAttributes( { videoId: val } ) }
+						options = { postSelection }
 					>
-					</TextControl>
-				</BlockSettingsMenuControls>
+					</SelectControl>
+				</InspectorControls>
 			}
 			<input type="hidden" className="videoId" value = { attributes.videoId }></input>
-			<video className={ classes } width={ attributes.width } height={ attributes.height } >
-				<source src={"github_auth_video?=" + attributes.videoId}></source>
-			</video>
+			<img src= { js_data.player_image } />
 		</div>
 	);
 }
+
+export default withSelect( (select, ownProps) => {
+	const { getEntityRecords } = select('core');
+	const postQuery = {
+		per_page: -1,
+		orderby: 'date',
+		order: 'asc',
+		status: 'publish'
+	};
+	return  { postList: getEntityRecords('postType', 'github-sponsor-video', postQuery)};
+} )(Edit);

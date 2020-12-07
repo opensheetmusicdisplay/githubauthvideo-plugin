@@ -4,10 +4,13 @@
 
     $token = NULL;
 
-    if(isset($request_data['access_token'])){
+    //TODO: Check if token still valid
+    if($request_data !== null && array_key_exists('access_token', $request_data) && isset($request_data['access_token'])){
         $token = $request_data['access_token'];
-    } else {
+    } else if(array_key_exists('access_token', $_POST)){
         $token = $_POST['access_token'];
+    } else if(array_key_exists('access_token', $_GET)){
+        $token = $_GET['access_token'];
     }
 
     if(!isset($token)){
@@ -18,18 +21,22 @@
 
     $tokenType = 'bearer';
 
-    if(isset($request_data['token_type'])){
+    if($request_data !== null && array_key_exists('token_type', $request_data) && isset($request_data['token_type'])){
         $tokenType = $request_data['token_type'];
-    } else {
+    } else if(array_key_exists('token_type', $_POST)){
         $tokenType = $_POST['token_type'];
+    } else if(array_key_exists('token_type', $_GET)){
+        $tokenType = $_GET['token_type'];
     }
 
     $videoId = NULL;
 
-    if(isset($request_data['video_id'])){
+    if($request_data !== null && array_key_exists('video_id', $request_data) && isset($request_data['video_id'])){
         $videoId = $request_data['video_id'];
-    } else {
+    } else if(array_key_exists('video_id', $_POST)){
         $videoId = $_POST['video_id'];
+    } else if(array_key_exists('video_id', $_GET)){
+        $videoId = $_GET['video_id'];
     }
 
     if(!isset($videoId)){
@@ -38,7 +45,7 @@
         exit;
     }
 
-    if(!isset(get_post($videoId))){
+    if(null == get_post($videoId)){
         header('HTTP/1.0 404 Not Found');
         echo 'Video mapping entry not found.';
         exit;
@@ -47,7 +54,6 @@
     $orgId = get_post_meta( get_the_ID(), 'githubauthvideo_github-organization-id', true );
     $tierId = get_post_meta( get_the_ID(), 'githubauthvideo_github-sponsorship-tier-id', true );
 
-    $url = 'https://api.github.com/graphql';
     //TODO: Once sponsorship tiers exist in Github, need to update this to query properly
     $ql = <<<EOT
         query {
@@ -73,18 +79,23 @@
     $options = array(
         'http' => array(
             'header'  => array('Content-type: application/json',
-            'Accept: application/json',
-            'User-Agent: PHP',
-            'Authorization: ' . $tokenType ' ' . $token),
+                'Accept: application/json',
+                'User-Agent: PHP',
+                'Authorization: ' . $tokenType . ' ' . $token
+            ),
             'method'  => 'POST',
             'content' => json_encode($data)
         )
     );
     $context  = stream_context_create($options);
-    $result = json_decode(file_get_contents($url, false, $context), true);
-    if ($result === FALSE) {
+    $result = json_decode(@file_get_contents(GITHUB_GRAPH_API_URL, false, $context), true);
+    if ($result == FALSE) {
         header('HTTP/1.0 500 Internal Server Error');
-        echo "Error checking Github API";
+        echo "Error checking Github API for Sponsor status. Token may be expired. Try clearing cache and authenticating again.";
+        exit;
+    } else if (array_key_exists('message', $result)) {
+        header('HTTP/1.0 500 Internal Server Error');
+        echo 'Error calling Github API. Error from Github: ' . $result['message'];
         exit;
     } else {
         //TODO: actually check results for sponsorships
@@ -106,9 +117,10 @@
         $options = array(
             'http' => array(
                 'header'  => array("Content-type: text/html",
-               // "Accept: video/*",
-                'User-Agent: PHP',
-                'method'  => 'GET'
+                // "Accept: video/*",
+                    'User-Agent: PHP',
+                    'method'  => 'GET'
+                )
             )
         );
         $context  = stream_context_create($options);

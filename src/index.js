@@ -81,6 +81,12 @@ registerBlockType( 'phonicscore/githubauthvideo', {
 	attributes: {
 		videoId: {
 			type: 'string'
+		},
+		width: {
+			type: 'number'
+		},
+		height: {
+			type: 'number'
 		}
 	}
 } );
