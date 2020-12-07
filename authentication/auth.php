@@ -18,14 +18,12 @@
         echo 'Github video authentication has not been configured properly. If you are the admin, please register your Github App and set a private key.';
         exit;
     }
-    //TODO: Re-enable on production deploy!!
     if($_SERVER['REQUEST_SCHEME'] != 'https'){
-        //echo 'Server must have SSL enabled for Github video Authentication.';
-        //exit;
+        echo 'Server must have SSL enabled for Github video Authentication.';
+        exit;
     }
-
-    //TODO: CHANGE BACK TO HTTPS
-    $REDIRECT_URI = 'http://'. $_SERVER['HTTP_HOST'] . '/github_auth';
+    //https is required. No option given
+    $REDIRECT_URI = 'https://'. $_SERVER['HTTP_HOST'] . '/github_auth';
 
     //setup JWT configuration used for generating 
     $configuration = Configuration::forSymmetricSigner(
@@ -34,12 +32,8 @@
     );
     //No Code present. Means we are just beginning the auth flow.
     if(!array_key_exists('code', $_GET)){
-        //Void out these cookies
-        setcookie('githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token', NULL, 
-                time() - 3600, '/', '', true);
-        setcookie('githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token_type', NULL, 
-                time() - 3600, '/', '', true);
-                
+        //Void out auth cookies
+        void_auth_cookies();
         $returnPath = '/';
         if(array_key_exists('return_path', $_GET)){
             $returnPath = urldecode($_GET['return_path']);
@@ -130,10 +124,7 @@
             exit;
         } else if(array_key_exists('access_token', $result)){
             $returnPathFromToken = $stateToken->claims()->get('return_path', '/'); // Retrieves the return path
-            setcookie('githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token', $result['access_token'], 
-                      time()+60*60*24*1, '/', '', true);
-            setcookie('githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token_type', $result['token_type'], 
-                      time()+60*60*24*1, '/', '', true);
+            set_auth_cookies($result['access_token'], $result['token_type']);
             header('Location: ' . $returnPathFromToken);
             die();
         } else {

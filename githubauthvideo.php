@@ -32,6 +32,20 @@ const VIDEO_CSS_URL = 'https://vjs.zencdn.net/7.10.2/video-js.css';
 
 include 'plugin_bootstrapping/settings.php';
 include 'plugin_bootstrapping/post_type.php';
+include 'authentication/cookies.php';
+
+//If we get more media utility functions like this, break out into it's own file.
+//For now, sufficient to contain it here
+function get_video_mime_type($location){
+	$mimes = new \Mimey\MimeTypes;
+	$mimeType = 'video/*';
+	//try path info
+	$pathInfo = pathinfo($location, PATHINFO_EXTENSION);
+	if(isset($pathInfo) && $pathInfo != ''){
+		$mimeType = $mimes->getMimeType($pathInfo);
+	}
+	return $mimeType;
+}
 
 function phonicscore_githubauthvideo_block_init() {
 	$dir = dirname( __FILE__ );
@@ -102,13 +116,16 @@ function render_github_auth($videoId = NULL){
 
 function render_video($videoId, $token, $tokenType){
 	$videoUrl = '/github_auth_video?video_id=' . $videoId . '&access_token=' . $token . '&token_type=' . $tokenType;
+	$location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
+	$mimeType = get_video_mime_type($location);
 	return <<<EOT
 		<div class="video-js-container">
-			<video class="video-js"
+			<video class="video-js vjs-fluid"
 			 controls
 			 preload="auto"
+			 data-setup='{}'
 			>
-				<source src="$videoUrl"></source>
+				<source src="$videoUrl" type="$mimeType"></source>
 			</video>
 		</div>
 	EOT;
@@ -129,16 +146,15 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 		return '<div>No video was selected.</div>';
 	}
 	//Check for cookies
-	//If cookies present, render video
-	$tokenKey = 'githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token';
-	if (!array_key_exists($tokenKey, $_COOKIE)){
+	$cookieData = get_auth_cookies();
+
+	if (!isset($cookieData['token'])){
 		return render_github_auth($videoId);
 	} else {
-		$token = $_COOKIE[$tokenKey];
+		$token = $cookieData['token'];
 		$tokenType = 'bearer';
-		$tokenTypeKey = 'githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token_type';
-		if(array_key_exists($tokenTypeKey, $_COOKIE)){
-			$tokenType = $_COOKIE[$tokenTypeKey];
+		if(isset($cookieData['token_type'])){
+			$tokenType = $cookieData['token_type'];
 		}
 		//Check if this token is still valid with the github API
 		$options = array(
@@ -187,28 +203,7 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
         array( ),
         '7.10.2',
         true
-	);
-	$main_settings_options = get_option( 'main_settings_option_name' ); // Array of All Options
-	if($main_settings_options){
-		$track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; //Google Analytics setting
-		if($track_with_google_analytics_3 == TRUE){
-			wp_enqueue_script(
-				'videojs-analytics-lib-script',
-				esc_url( plugins_url( 'frontend_scripts/videojs-analytics.min.js', __FILE__ ) ),
-				array( 'video-script' ),
-				'1.0.0',
-				true
-			);		
-			wp_enqueue_script(
-				'video-analytics-script',
-				esc_url( plugins_url( 'frontend_scripts/analytics.js', __FILE__ ) ),
-				array( 'video-script', 'videojs-analytics-lib-script' ),
-				'0.1.0',
-				true
-			);			
-		}
-	}
-	
+	);	
 }
 
 function enqueue_editor_assets(){

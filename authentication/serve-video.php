@@ -51,8 +51,8 @@
         exit;
     }
 
-    $orgId = get_post_meta( get_the_ID(), 'githubauthvideo_github-organization-id', true );
-    $tierId = get_post_meta( get_the_ID(), 'githubauthvideo_github-sponsorship-tier-id', true );
+    $orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-id', true );
+    $tierId = get_post_meta( $videoId, 'githubauthvideo_github-sponsorship-tier-id', true );
 
     //TODO: Once sponsorship tiers exist in Github, need to update this to query properly
     $ql = <<<EOT
@@ -99,17 +99,13 @@
         exit;
     } else {
         //TODO: actually check results for sponsorships
-        //$isUrl = get_post_meta( $videoId, 'githubauthvideo_is-url-video', true );
         $location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
-        /*if($isUrl){
-            $location = get_post_meta( $videoId, 'githubauthvideo_video-location-url', true );
-        } else {
-            $location = get_post_meta( get_the_ID(), 'githubauthvideo_video-location-server-path', true );
-        }*/
+
+        $mimeType = get_video_mime_type($location);
         //Prep our response
         header('Content-Description: File Transfer');
         //TODO: detect mime type
-        header('Content-Type: video/mp4');
+        header('Content-Type: ' . $mimeType);
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
@@ -117,7 +113,7 @@
         $options = array(
             'http' => array(
                 'header'  => array("Content-type: text/html",
-                // "Accept: video/*",
+                    'Accept: video/*',
                     'User-Agent: PHP',
                     'method'  => 'GET'
                 )
@@ -132,28 +128,5 @@
         }
         fpassthru($handle);
         fclose($handle);
-        /*
-        if(!$isUrl){
-            if (file_exists($location)) {
-                header('Content-Length: ' . filesize($location));
-                $result = readfile($location);
-                exit;
-            } else {
-                header('HTTP/1.0 404 Not Found');
-                echo 'Video file not found on server.';
-                exit;
-            }            
-        } else {
-            $options = array(
-                'http' => array(
-                    'header'  => array("Content-type: text/html",
-                   // "Accept: video/*",
-                    'User-Agent: PHP',
-                    'method'  => 'GET'
-                )
-            );
-            $context  = stream_context_create($options);
-            $handle = fopen($location, 'r', false, $context);
-        }*/
     }
 ?>
