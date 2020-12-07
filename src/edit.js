@@ -1,7 +1,6 @@
 import { InspectorControls } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { withSelect } from "@wordpress/data";
-//import { SelectVideoControl } from "./SelectVideoControl";
 /**
  * Retrieves the translation of text.
  *
@@ -29,11 +28,11 @@ import './editor.scss';
  * @return {WPElement} Element to render.
  */
 const Edit = ( {attributes, postList, className, setAttributes} ) => {
-	let postSelection = [{label: "Loading...", value: -1}];
+	let postSelection = [{label: "Select Video...", value: -1}];
 	if(postList && postList.length > 0){
-		postSelection = postList.map((value, index, array) => {
+		postSelection = postSelection.concat(postList.map((value, index, array) => {
 			return {label: value.title.raw, value: value.id};
-		});
+		}));
 	}
 	return (
 		<div className={ className }>

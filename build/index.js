@@ -194,7 +194,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- //import { SelectVideoControl } from "./SelectVideoControl";
 
 /**
  * Retrieves the translation of text.
@@ -229,17 +228,17 @@ var Edit = function Edit(_ref) {
       className = _ref.className,
       setAttributes = _ref.setAttributes;
   var postSelection = [{
-    label: "Loading...",
+    label: "Select Video...",
     value: -1
   }];
 
   if (postList && postList.length > 0) {
-    postSelection = postList.map(function (value, index, array) {
+    postSelection = postSelection.concat(postList.map(function (value, index, array) {
       return {
         label: value.title.raw,
         value: value.id
       };
-    });
+    }));
   }
 
   return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])("div", {
@@ -306,7 +305,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _style_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./style.scss */ "./src/style.scss");
 /* harmony import */ var _style_scss__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_style_scss__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _edit__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./edit */ "./src/edit.js");
-/* harmony import */ var _save__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./save */ "./src/save.js");
 /**
  * Registers a new block provided a unique name and an object defining its behavior.
  *
@@ -332,7 +330,6 @@ __webpack_require__.r(__webpack_exports__);
 /**
  * Internal dependencies
  */
-
 
 
 /**
@@ -380,57 +377,21 @@ Object(_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__["registerBlockType"])('pho
   edit: _edit__WEBPACK_IMPORTED_MODULE_3__["default"],
 
   /**
-   * @see ./save.js
+   * Using server-side rendering in ../githubauthvideo.php
    */
   save: function save() {
     return null;
   },
   attributes: {
     videoId: {
+      type: 'string',
+      default: '-1'
+    },
+    size: {
       type: 'string'
-    },
-    width: {
-      type: 'number'
-    },
-    height: {
-      type: 'number'
     }
   }
 });
-
-/***/ }),
-
-/***/ "./src/save.js":
-/*!*********************!*\
-  !*** ./src/save.js ***!
-  \*********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return save; });
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
-/**
- * Retrieves the translation of text.
- *
- * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
- */
-
-/**
- * The save function defines the way in which the different attributes should
- * be combined into the final markup, which is then serialized by the block
- * editor into `post_content`.
- *
- * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#save
- *
- * @return {WPElement} Element to render.
- */
-
-function save() {
-  return null;
-}
 
 /***/ }),
 

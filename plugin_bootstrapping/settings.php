@@ -13,14 +13,12 @@ class GithubVideoAuthMainSettings {
 	}
 
 	public function main_settings_add_plugin_page() {
-		add_menu_page(
+		add_options_page(
             'Github Sponsor Video',
             'Github Sponsor Video Plugin',
             'manage_options',
             'githubauthvideo',
-			array( $this, 'main_settings_create_admin_page' ), // function
-			'dashicons-admin-generic', // icon_url
-			3 // position
+			array( $this, 'main_settings_create_admin_page' ) // function
 		);
 	}
 
@@ -28,7 +26,7 @@ class GithubVideoAuthMainSettings {
 		$this->main_settings_options = get_option( 'main_settings_option_name' ); ?>
 
 		<div class="wrap">
-			<h2>Main Settings</h2>
+			<h2>Plugin Settings</h2>
 			<p></p>
 			<?php settings_errors(); ?>
 
@@ -79,6 +77,15 @@ class GithubVideoAuthMainSettings {
 			'main-settings-admin', // page
 			'main_settings_setting_section' // section
 		);
+
+
+		add_settings_field(
+			'track_with_google_analytics_3', // id
+			'Track With Google Analytics', // title
+			array( $this, 'track_with_google_analytics_3_callback' ), // callback
+			'main-settings-admin', // page
+			'main_settings_setting_section' // section
+		);
 	}
 
 	public function main_settings_sanitize($input) {
@@ -93,6 +100,10 @@ class GithubVideoAuthMainSettings {
 
 		if ( isset( $input['jwt_private_key_2'] ) ) {
 			$sanitary_values['jwt_private_key_2'] = sanitize_text_field( $input['jwt_private_key_2'] );
+		}
+
+		if ( isset( $input['track_with_google_analytics_3'] ) ) {
+			$sanitary_values['track_with_google_analytics_3'] = $input['track_with_google_analytics_3'];
 		}
 		return $sanitary_values;
 	}
@@ -122,6 +133,13 @@ class GithubVideoAuthMainSettings {
 		);
 	}
 
+	public function track_with_google_analytics_3_callback() {
+		printf(
+			'<input type="checkbox" name="main_settings_option_name[track_with_google_analytics_3]" id="track_with_google_analytics_3" value="track_with_google_analytics_3" %s> <label for="track_with_google_analytics_3">If GA is added to the front-end, the player can automatically track playback events to it.</label>',
+			( isset( $this->main_settings_options['track_with_google_analytics_3'] ) && $this->main_settings_options['track_with_google_analytics_3'] === 'track_with_google_analytics_3' ) ? 'checked' : ''
+		);
+	}
+
 }
 if ( is_admin() )
 	$main_settings = new GithubVideoAuthMainSettings();
@@ -132,6 +150,7 @@ if ( is_admin() )
  * $github_app_client_id_0 = $main_settings_options['github_app_client_id_0']; // Github App Client ID
  * $github_app_client_secret_1 = $main_settings_options['github_app_client_secret_1']; // Github App Client Secret
  * $jwt_private_key_2 = $main_settings_options['jwt_private_key_2']; // Private Key For Session Generation
+ * $track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; // Whether we want to enable google analytics or not (needs included already)
  */
 
  ?>

@@ -72,14 +72,16 @@ function githubauthvideo_register_post_type() {
  * Video Location URI = get_post_meta( get_the_ID(), 'githubauthvideo_video-location-uri', true )
  * Github Organization ID = get_post_meta( get_the_ID(), 'githubauthvideo_github-organization-id', true )
  * Github Sponsorship Tier ID = get_post_meta( get_the_ID(), 'githubauthvideo_github-sponsorship-tier-id', true )
+ * Splash Screen = get_post_meta( get_the_ID(), 'githubauthvideo_splash-screen', true )
  */
 class Github_Video_Entry_Fields {
-	private $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["post"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"url","label":"Video Location URI","id":"githubauthvideo_video-location-uri"},{"type":"text","label":"Github Organization ID","id":"githubauthvideo_github-organization-id"},{"type":"text","label":"Github Sponsorship Tier ID","default":"*","id":"githubauthvideo_github-sponsorship-tier-id"}]}';
+	private $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["post"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"url","label":"Video Location URI","id":"githubauthvideo_video-location-uri"},{"type":"text","label":"Github Organization ID","id":"githubauthvideo_github-organization-id"},{"type":"text","label":"Github Sponsorship Tier ID","default":"*","id":"githubauthvideo_github-sponsorship-tier-id"},{"type":"media","label":"Splash Screen","return":"url","id":"githubauthvideo_splash-screen"}]}';
 
 	public function __construct() {
 		$this->config = json_decode( $this->config, true );
 		$this->process_cpts();
 		add_action( 'add_meta_boxes', [ $this, 'add_meta_boxes' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 		add_action( 'admin_head', [ $this, 'admin_head' ] );
 		add_action( 'save_post', [ $this, 'save_post' ] );
 	}
@@ -108,9 +110,38 @@ class Github_Video_Entry_Fields {
 		}
 	}
 
+	public function admin_enqueue_scripts() {
+		global $typenow;
+		if ( in_array( $typenow, $this->config['post-type'] ) ) {
+			wp_enqueue_media();
+		}
+	}
+
 	public function admin_head() {
 		global $typenow;
 		if ( in_array( $typenow, $this->config['post-type'] ) ) {
+			?><script>
+				jQuery.noConflict();
+				(function($) {
+					$(function() {
+						$('body').on('click', '.rwp-media-toggle', function(e) {
+							e.preventDefault();
+							let button = $(this);
+							let rwpMediaUploader = null;
+							rwpMediaUploader = wp.media({
+								title: button.data('modal-title'),
+								button: {
+									text: button.data('modal-button')
+								},
+								multiple: true
+							}).on('select', function() {
+								let attachment = rwpMediaUploader.state().get('selection').first().toJSON();
+								button.prev().val(attachment[button.data('return')]);
+							}).open();
+						});
+					});
+				})(jQuery);
+			</script><?php
 			?><?php
 		}
 	}
@@ -153,6 +184,12 @@ class Github_Video_Entry_Fields {
 
 	private function label( $field ) {
 		switch ( $field['type'] ) {
+			case 'media':
+				printf(
+					'<label class="" for="%s_button">%s</label>',
+					$field['id'], $field['label']
+				);
+				break;
 			default:
 				printf(
 					'<label class="" for="%s">%s</label>',
@@ -163,12 +200,19 @@ class Github_Video_Entry_Fields {
 
 	private function field( $field ) {
 		switch ( $field['type'] ) {
+			case 'media':
+				$this->input( $field );
+				$this->media_button( $field );
+				break;
 			default:
 				$this->input( $field );
 		}
 	}
 
 	private function input( $field ) {
+		if ( $field['type'] === 'media' ) {
+			$field['type'] = 'text';
+		}
 		printf(
 			'<input class="regular-text %s" id="%s" name="%s" %s type="%s" value="%s">',
 			isset( $field['class'] ) ? $field['class'] : '',
@@ -176,6 +220,17 @@ class Github_Video_Entry_Fields {
 			isset( $field['pattern'] ) ? "pattern='{$field['pattern']}'" : '',
 			$field['type'],
 			$this->value( $field )
+		);
+	}
+
+	private function media_button( $field ) {
+		printf(
+			' <button class="button rwp-media-toggle" data-modal-button="%s" data-modal-title="%s" data-return="%s" id="%s_button" name="%s_button" type="button">%s</button>',
+			isset( $field['modal-button'] ) ? $field['modal-button'] : __( 'Select this file', 'githubauthvideo' ),
+			isset( $field['modal-title'] ) ? $field['modal-title'] : __( 'Choose a file', 'githubauthvideo' ),
+			$field['return'],
+			$field['id'], $field['id'],
+			isset( $field['button-text'] ) ? $field['button-text'] : __( 'Upload', 'githubauthvideo' )
 		);
 	}
 

@@ -76,87 +76,63 @@ function phonicscore_githubauthvideo_block_init() {
 	) );
 }
 
-function render_github_auth(){
+function render_github_auth($videoId = NULL){
 	$returnPath = $_SERVER['REQUEST_URI'];
 	$authUrl = esc_url( '/github_auth?return_path=' . urlencode($returnPath) );
 	$splashUrl = esc_url( plugins_url( 'images/blur.png', __FILE__ ) );
+	if(isset($videoId)) {
+		$metaSplash =  get_post_meta( $videoId, 'githubauthvideo_splash-screen', true );
+		if(isset($metaSplash) && !empty($metaSplash)){
+			$splashUrl = $metaSplash;
+		}
+	}
 	$ghIconUrl = esc_url( plugins_url( 'images/github-icon.png', __FILE__ ) );
-	//TODO: Include style as CSS file
-	?>
-	<style>
-		.video-auth-spash{
-			background-repeat: no-repeat;
-			background-size: contain;
-			background-image: url('<?php echo $splashUrl; ?>');
-			min-height: 330px;
-			text-align: center;
-		}
-		.video-auth-splash-cover{
-			width: 100%;
-			height: 100%;
-			min-height: 330px;
-			background: rgba(0,0,0,.5);
-			display: flex;
-			justify-content: center;
-			align-items: center; 
-		}
-		.github-icon{
-			display: inline;
-			margin-right: 5px;
-			vertical-align: middle;
-		}
-
-		.github-button-text{
-			vertical-align: middle;
-		}
-	</style>
-	<div class="video-auth-spash">
+	return <<<EOT
+	<div class="video-auth-spash" style="background-image: url('$splashUrl');">
 		<div class="video-auth-splash-cover">
-			<a href="<?php echo $authUrl; ?>">
+			<a href="$authUrl">
 				<button>
-					<img class="github-icon" src="<?php echo $ghIconUrl; ?>"> <span class="github-button-text">Authenticate with Github</span>
+					<img class="github-icon" src="$ghIconUrl"> <span class="github-button-text">Authenticate with Github</span>
 				</button>
 			</a>
 		</div>
 	</div>
-	<?php
+	EOT;
 }
 
 function render_video($videoId, $token, $tokenType){
 	$videoUrl = '/github_auth_video?video_id=' . $videoId . '&access_token=' . $token . '&token_type=' . $tokenType;
-	?>
-		<style>
-			.video-js-container{
-				min-height: 75%;
-			}
-			.video-js{
-				height: 100%;
-			}
-		</style>
+	return <<<EOT
 		<div class="video-js-container">
 			<video class="video-js"
 			 controls
 			 preload="auto"
 			>
-				<source src="<?php echo $videoUrl; ?>"></source>
+				<source src="$videoUrl"></source>
 			</video>
 		</div>
-	<?php
+	EOT;
 }
 
 //Determines what's rendered in WP.
 function phonicscore_githubauthvideo_block_render_callback($block_attributes, $content) {
-
+	if(is_admin()){
+		return '';
+	}
 	if(!isset($block_attributes['videoId'])){
-		return '<div>No video ID was set.</div>';
+		return '<div>No video was selected.</div>';
 	}
 
 	$videoId = $block_attributes['videoId'];
+
+	if($videoId == -1){
+		return '<div>No video was selected.</div>';
+	}
 	//Check for cookies
 	//If cookies present, render video
 	$tokenKey = 'githubauthvideo' . $_SERVER['HTTP_HOST'] . '_token';
 	if (!array_key_exists($tokenKey, $_COOKIE)){
-		return render_github_auth();
+		return render_github_auth($videoId);
 	} else {
 		$token = $_COOKIE[$tokenKey];
 		$tokenType = 'bearer';
@@ -179,7 +155,7 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 		$result = json_decode(@file_get_contents(GITHUB_GRAPH_API_URL, false, $context), true);
 		if ($result == FALSE || array_key_exists('message', $result)) {
 			//Token is likely expired. need to auth again.
-			return render_github_auth();
+			return render_github_auth($videoId);
 		}
 		//Token seems to be valid, render actual video embed
 		return render_video($videoId, $token, $tokenType);
@@ -211,7 +187,28 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
         array( ),
         '7.10.2',
         true
-    );
+	);
+	$main_settings_options = get_option( 'main_settings_option_name' ); // Array of All Options
+	if($main_settings_options){
+		$track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; //Google Analytics setting
+		if($track_with_google_analytics_3 == TRUE){
+			wp_enqueue_script(
+				'videojs-analytics-lib-script',
+				esc_url( plugins_url( 'frontend_scripts/videojs-analytics.min.js', __FILE__ ) ),
+				array( 'video-script' ),
+				'1.0.0',
+				true
+			);		
+			wp_enqueue_script(
+				'video-analytics-script',
+				esc_url( plugins_url( 'frontend_scripts/analytics.js', __FILE__ ) ),
+				array( 'video-script', 'videojs-analytics-lib-script' ),
+				'0.1.0',
+				true
+			);			
+		}
+	}
+	
 }
 
 function enqueue_editor_assets(){
