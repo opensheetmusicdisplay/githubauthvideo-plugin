@@ -117,10 +117,17 @@ function render_github_auth($videoId = NULL){
 function render_video($videoId, $token, $tokenType){
 	$videoUrl = '/github_auth_video?video_id=' . $videoId . '&access_token=' . $token . '&token_type=' . $tokenType;
 	$location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
+	$title = '';
+	$post = get_post($videoId);
+	if($post){
+		$title = $post->post_title;
+	}
 	$mimeType = get_video_mime_type($location);
 	return <<<EOT
 		<div class="video-js-container">
 			<video class="video-js vjs-fluid"
+			 title="$title"
+			 alt="$videoId"
 			 controls
 			 preload="auto"
 			 data-setup='{}'
@@ -203,7 +210,21 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
         array( ),
         '7.10.2',
         true
-	);	
+	);
+
+	$main_settings_options = get_option( 'main_settings_option_name' ); // Array of All Options
+	if($main_settings_options){
+		$track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; //Google Analytics setting
+		if($track_with_google_analytics_3 == TRUE){	
+			wp_enqueue_script(
+				'video-analytics-script',
+				esc_url( plugins_url( 'frontend_scripts/analytics.js', __FILE__ ) ),
+				array( ),
+				'0.1.0',
+				true
+			);			
+		}
+	}
 }
 
 function enqueue_editor_assets(){
