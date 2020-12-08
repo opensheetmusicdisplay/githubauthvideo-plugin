@@ -45,13 +45,14 @@
     }
 
     playbackSeeked(event){
+      console.log(this.element.currentTime);
       this.eventHandlerCallback('seek', this.videoTitle, this.videoId, this.element.currentTime);
     }
 
     volumeChanged(event){
-      let vol = this.element.volume;
+      let vol = this.element.volume * 100;
       if (this.element.muted){
-        vol = 0.0;
+        vol = 0;
       }
       this.eventHandlerCallback('volume-change', this.videoTitle, this.videoId, vol);
     }
@@ -63,7 +64,7 @@
       eventCategory: 'Video',
       eventAction: action,
       eventLabel: id + ': ' + title,
-      value: value
+      eventValue: Math.floor(value)
     });
   }
 
