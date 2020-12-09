@@ -203,6 +203,7 @@ add_action( 'parse_request', function( $wp ){
 add_action( 'wp_enqueue_scripts', 'phonicscore_githubauthvideo_block_enqueue_js' );
 function phonicscore_githubauthvideo_block_enqueue_js( ) {
 	//Can't do conditional enqueuing since the block could be embedded on any post
+	/*
 	wp_enqueue_style( 'video-style', VIDEO_CSS_URL, array( ), '7.10.2' );
     wp_enqueue_script(
         'video-script',
@@ -211,7 +212,7 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
         '7.10.2',
         true
 	);
-
+	*/
 	$main_settings_options = get_option( 'main_settings_option_name' ); // Array of All Options
 	if($main_settings_options){
 		$track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; //Google Analytics setting
