@@ -1,17 +1,10 @@
 <?php
+    //TODO: Instead of doing this, just check cookies
     $json = file_get_contents('php://input');
     $request_data = json_decode($json, true);
+    $Cookies = GithubAuthCookies::getCookiesInstance();
 
-    $token = NULL;
-
-    //TODO: Check if token still valid
-    if($request_data !== null && array_key_exists('access_token', $request_data) && isset($request_data['access_token'])){
-        $token = $request_data['access_token'];
-    } else if(array_key_exists('access_token', $_POST)){
-        $token = $_POST['access_token'];
-    } else if(array_key_exists('access_token', $_GET)){
-        $token = $_GET['access_token'];
-    }
+    $token = $Cookies->get_token();
 
     if(!isset($token)){
         header('HTTP/1.0 401 Unauthorized');
@@ -19,15 +12,7 @@
         exit;
     }
 
-    $tokenType = 'bearer';
-
-    if($request_data !== null && array_key_exists('token_type', $request_data) && isset($request_data['token_type'])){
-        $tokenType = $request_data['token_type'];
-    } else if(array_key_exists('token_type', $_POST)){
-        $tokenType = $_POST['token_type'];
-    } else if(array_key_exists('token_type', $_GET)){
-        $tokenType = $_GET['token_type'];
-    }
+    $tokenType = $Cookies->get_token_type();
 
     $videoId = NULL;
 
@@ -51,54 +36,22 @@
         exit;
     }
 
+    $GithubApi = new GithubAPIService(GITHUB_GRAPH_API_URL);
     $orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-id', true );
-    $tierId = get_post_meta( $videoId, 'githubauthvideo_github-sponsorship-tier-id', true );
+    //$tierId = get_post_meta( $videoId, 'githubauthvideo_github-sponsorship-tier-id', true );
 
-    //TODO: Once sponsorship tiers exist in Github, need to update this to query properly
-    $ql = <<<EOT
-        query {
-            viewer {
-                login
-                sponsorshipsAsSponsor(after: "test", first: 10) {
-                edges {
-                    node {
-                    sponsorEntity {
-                        ... on Organization {
-                        id
-                        email
-                        }
-                    }
-                    }
-                }
-                }
-            }
-        }
-    EOT;
-    $data = array('query' => $ql);
-    // use key 'http' even if you send the request to https://...
-    $options = array(
-        'http' => array(
-            'header'  => array('Content-type: application/json',
-                'Accept: application/json',
-                'User-Agent: PHP',
-                'Authorization: ' . $tokenType . ' ' . $token
-            ),
-            'method'  => 'POST',
-            'content' => json_encode($data)
-        )
-    );
-    $context  = stream_context_create($options);
-    $result = json_decode(@file_get_contents(GITHUB_GRAPH_API_URL, false, $context), true);
-    if ($result == FALSE) {
+    //use github api service methods, check here
+    $result = $GithubApi->is_viewer_sponsor_of_org($orgId);
+    if(gettype($result) === 'string'){
         header('HTTP/1.0 500 Internal Server Error');
-        echo "Error checking Github API for Sponsor status. Token may be expired. Try clearing cache and authenticating again.";
+        echo 'Error checking Github API for Sponsor status. See message(s) below:<br>';
+        echo $result;
         exit;
-    } else if (array_key_exists('message', $result)) {
-        header('HTTP/1.0 500 Internal Server Error');
-        echo 'Error calling Github API. Error from Github: ' . $result['message'];
+    } else if (!$result){
+        header('HTTP/1.0 401 Unauthorized');
+        echo 'User is not sponsor of this video\'s Github organization';
         exit;
     } else {
-        //TODO: actually check results for sponsorships
         $location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
 
         $mimeType = get_video_mime_type($location);

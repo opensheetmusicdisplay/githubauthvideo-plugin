@@ -30,9 +30,10 @@ const GITHUB_OAUTH_TOKEN_URL = 'https://github.com/login/oauth/access_token';
 const VIDEO_JS_URL = 'https://vjs.zencdn.net/7.10.2/video.js';
 const VIDEO_CSS_URL = 'https://vjs.zencdn.net/7.10.2/video-js.css';
 
-include 'plugin_bootstrapping/settings.php';
-include 'plugin_bootstrapping/post_type.php';
-include 'authentication/cookies.php';
+include 'admin-pages/settings.php';
+include 'admin-pages/post_type.php';
+include 'authentication/GithubAuthCookies.php';
+include 'api/GithubAPIService.php';
 
 //If we get more media utility functions like this, break out into it's own file.
 //For now, sufficient to contain it here
@@ -90,9 +91,7 @@ function phonicscore_githubauthvideo_block_init() {
 	) );
 }
 
-function render_github_auth($videoId = NULL){
-	$returnPath = $_SERVER['REQUEST_URI'];
-	$authUrl = esc_url( '/github_auth?return_path=' . urlencode($returnPath) );
+function get_splash_image($videoId = NULL){
 	$splashUrl = esc_url( plugins_url( 'images/blur.png', __FILE__ ) );
 	if(isset($videoId)) {
 		$metaSplash =  get_post_meta( $videoId, 'githubauthvideo_splash-screen', true );
@@ -100,6 +99,14 @@ function render_github_auth($videoId = NULL){
 			$splashUrl = $metaSplash;
 		}
 	}
+
+	return $splashUrl;
+}
+
+function render_github_auth($videoId = NULL){
+	$returnPath = $_SERVER['REQUEST_URI'];
+	$authUrl = esc_url( '/github_auth?return_path=' . urlencode($returnPath) );
+	$splashUrl = get_splash_image($videoId);
 	$ghIconUrl = esc_url( plugins_url( 'images/github-icon.png', __FILE__ ) );
 	return <<<EOT
 	<div class="video-auth-spash" style="background-image: url('$splashUrl');">
@@ -114,8 +121,30 @@ function render_github_auth($videoId = NULL){
 	EOT;
 }
 
-function render_video($videoId, $token, $tokenType){
-	$videoUrl = '/github_auth_video?video_id=' . $videoId . '&access_token=' . $token . '&token_type=' . $tokenType;
+function render_sponsor($videoId = NULL, $orgId = ''){
+	$splashUrl = get_splash_image($videoId);
+	$ghIconUrl = esc_url( plugins_url( 'images/github-icon.png', __FILE__ ) );
+	//TODO: Have reasonable default
+	$sponsorUrl = esc_url('https://github.com/sponsors/' . $orgId);
+	return <<<EOT
+	<div class="video-auth-spash" style="background-image: url('$splashUrl');">
+		<div class="video-auth-splash-cover">
+			<div class="sponsor-message-block">
+				<text>Only Github sponsors have access to this video.</text>
+			</div>
+			<br>
+			<a href="$sponsorUrl" target="_blank">
+				<button>
+					<img class="github-icon" src="$ghIconUrl"> <span class="github-button-text">Become a sponsor now!</span>
+				</button>
+			</a>
+		</div>
+	</div>
+	EOT;
+}
+
+function render_video($videoId){
+	$videoUrl = '/github_auth_video?video_id=' . $videoId;
 	$location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
 	$title = '';
 	$post = get_post($videoId);
@@ -152,38 +181,22 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 	if($videoId == -1){
 		return '<div>No video was selected.</div>';
 	}
-	//Check for cookies
-	$cookieData = get_auth_cookies();
-
-	if (!isset($cookieData['token'])){
-		return render_github_auth($videoId);
+	$GithubApi = new GithubAPIService(GITHUB_GRAPH_API_URL);
+	$orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-id', true );
+	
+	if($GithubApi->is_token_valid()){
+		if($GithubApi->is_viewer_sponsor_of_org($videoId)){
+			//Token seems to be valid, render actual video embed
+			return render_video($videoId);
+		} else {
+			//User auth'd correctly, but is not sponsor of specified organization
+			return render_sponsor($videoId, $orgId);
+		}
 	} else {
-		$token = $cookieData['token'];
-		$tokenType = 'bearer';
-		if(isset($cookieData['token_type'])){
-			$tokenType = $cookieData['token_type'];
-		}
-		//Check if this token is still valid with the github API
-		$options = array(
-			'http' => array(
-				'header'  => array('Content-type: application/json',
-					'Accept: application/json',
-					'User-Agent: PHP',
-					'Authorization: ' . $tokenType . ' ' . $token
-				),
-				'method'  => 'POST'
-			)
-		);
-		$context  = stream_context_create($options);
-		$result = json_decode(@file_get_contents(GITHUB_GRAPH_API_URL, false, $context), true);
-		if ($result == FALSE || array_key_exists('message', $result)) {
-			//Token is likely expired. need to auth again.
-			return render_github_auth($videoId);
-		}
-		//Token seems to be valid, render actual video embed
-		return render_video($videoId, $token, $tokenType);
+		//User is not auth'd properly
+		return render_github_auth($videoId);
 	}
-	//Auth link navigates to github_auth with a 'return_path' query param (the current path)
+	
 }
 
 add_action( 'init', 'phonicscore_githubauthvideo_block_init' );

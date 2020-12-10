@@ -19,21 +19,22 @@
         exit;
     }
     if($_SERVER['REQUEST_SCHEME'] != 'https'){
-        echo 'Server must have SSL enabled for Github video Authentication.';
-        exit;
+        //echo 'Server must have SSL enabled for Github video Authentication.';
+        //exit;
     }
     //https is required. No option given
-    $REDIRECT_URI = 'https://'. $_SERVER['HTTP_HOST'] . '/github_auth';
+    $REDIRECT_URI = 'http://'. $_SERVER['HTTP_HOST'] . '/github_auth';
 
     //setup JWT configuration used for generating 
     $configuration = Configuration::forSymmetricSigner(
         new Sha256(),
         InMemory::base64Encoded($JWT_PRIVATE_KEY)
     );
+    $Cookies = GithubAuthCookies::getCookiesInstance();
     //No Code present. Means we are just beginning the auth flow.
     if(!array_key_exists('code', $_GET)){
         //Void out auth cookies
-        void_auth_cookies();
+        $Cookies->void_auth_cookies();
         $returnPath = '/';
         if(array_key_exists('return_path', $_GET)){
             $returnPath = urldecode($_GET['return_path']);
@@ -124,7 +125,7 @@
             exit;
         } else if(array_key_exists('access_token', $result)){
             $returnPathFromToken = $stateToken->claims()->get('return_path', '/'); // Retrieves the return path
-            set_auth_cookies($result['access_token'], $result['token_type']);
+            $Cookies->set_auth_cookies($result['access_token'], $result['token_type']);
             header('Location: ' . $returnPathFromToken);
             die();
         } else {

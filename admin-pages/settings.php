@@ -85,6 +85,14 @@ class GithubVideoAuthMainSettings {
 			'main-settings-admin', // page
 			'main_settings_setting_section' // section
 		);
+
+		add_settings_field(
+			'ignore_sponsorship_4', // id
+			'Ignore Sponsorship Status', // title
+			array( $this, 'ignore_sponsorship_4_callback' ), // callback
+			'main-settings-admin', // page
+			'main_settings_setting_section' // section
+		);
 	}
 
 	public function main_settings_sanitize($input) {
@@ -103,6 +111,10 @@ class GithubVideoAuthMainSettings {
 
 		if ( isset( $input['track_with_google_analytics_3'] ) ) {
 			$sanitary_values['track_with_google_analytics_3'] = $input['track_with_google_analytics_3'];
+		}
+
+		if ( isset( $input['ignore_sponsorship_4'] ) ) {
+			$sanitary_values['ignore_sponsorship_4'] = $input['ignore_sponsorship_4'];
 		}
 		return $sanitary_values;
 	}
@@ -139,6 +151,13 @@ class GithubVideoAuthMainSettings {
 		);
 	}
 
+	public function ignore_sponsorship_4_callback() {
+		printf(
+			'<input type="checkbox" name="main_settings_option_name[ignore_sponsorship_4]" id="ignore_sponsorship_4" value="ignore_sponsorship_4" %s> <label for="ignore_sponsorship_4">Check to ignore whether the user is a sponsor of the specified organization. Just Github authentication will grant them access.</label>',
+			( isset( $this->main_settings_options['ignore_sponsorship_4'] ) && $this->main_settings_options['ignore_sponsorship_4'] === 'ignore_sponsorship_4' ) ? 'checked' : ''
+		);
+	}
+
 }
 if ( is_admin() )
 	$main_settings = new GithubVideoAuthMainSettings();
@@ -150,6 +169,7 @@ if ( is_admin() )
  * $github_app_client_secret_1 = $main_settings_options['github_app_client_secret_1']; // Github App Client Secret
  * $jwt_private_key_2 = $main_settings_options['jwt_private_key_2']; // Private Key For Session Generation
  * $track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; // Whether we want to enable google analytics or not (needs included already)
+ * $ignore_sponsorship_4 = $main_settings_options['ignore_sponsorship_4']; // Whether to track if the user is sponsoring the organization or not for video access
  */
 
  ?>

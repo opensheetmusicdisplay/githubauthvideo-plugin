@@ -75,7 +75,7 @@ function githubauthvideo_register_post_type() {
  * Splash Screen = get_post_meta( get_the_ID(), 'githubauthvideo_splash-screen', true )
  */
 class Github_Video_Entry_Fields {
-	private $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["github-sponsor-video"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"url","label":"Video Location URI","id":"githubauthvideo_video-location-uri"},{"type":"text","label":"Github Organization ID","id":"githubauthvideo_github-organization-id"},{"type":"text","label":"Github Sponsorship Tier ID","default":"*","id":"githubauthvideo_github-sponsorship-tier-id"},{"type":"media","label":"Splash Screen","return":"url","id":"githubauthvideo_splash-screen"}]}';
+	private $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["github-sponsor-video"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"url","label":"Video Location URI","id":"githubauthvideo_video-location-uri"},{"type":"text","label":"Github Organization Slug","id":"githubauthvideo_github-organization-id"},{"type":"text","label":"Github Sponsorship Tier ID (Not used yet)","default":"*","id":"githubauthvideo_github-sponsorship-tier-id"},{"type":"media","label":"Splash Screen","return":"url","id":"githubauthvideo_splash-screen"}]}';
 
 	public function __construct() {
 		$this->config = json_decode( $this->config, true );
