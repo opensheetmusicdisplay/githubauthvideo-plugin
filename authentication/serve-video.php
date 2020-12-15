@@ -37,7 +37,7 @@
     }
 
     $GithubApi = new GithubAPIService(GITHUB_GRAPH_API_URL);
-    $orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-id', true );
+    $orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-slug', true );
     //$tierId = get_post_meta( $videoId, 'githubauthvideo_github-sponsorship-tier-id', true );
 
     //use github api service methods, check here
@@ -77,7 +77,7 @@
         if(!(isset($handle))){
             header('HTTP/1.0 404 Not Found');
             echo 'Video file could not be found.';
-            exit;            
+            exit;
         }
         fpassthru($handle);
         fclose($handle);

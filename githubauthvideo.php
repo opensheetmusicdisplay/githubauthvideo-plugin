@@ -5,7 +5,7 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 /**
  * Plugin Name:     Github Authenticated Video
  * Description:     Video that is behind github oauth prompt. Checks for sponsorship
- * Version:         0.1.0
+ * Version:         1.0.0
  * Author:          Justin Litten
  * License:         GPL-2.0-or-later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
@@ -146,6 +146,7 @@ function render_sponsor($videoId = NULL, $orgId = ''){
 function render_video($videoId){
 	$videoUrl = '/github_auth_video?video_id=' . $videoId;
 	$location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
+	$textContent = get_post_meta( $videoId, 'githubauthvideo_video-description', true );
 	$title = '';
 	$post = get_post($videoId);
 	if($post){
@@ -153,6 +154,7 @@ function render_video($videoId){
 	}
 	$mimeType = get_video_mime_type($location);
 	return <<<EOT
+		<h5 class="video-title-container">$title</h5>
 		<div class="video-js-container">
 			<video class="video-js vjs-fluid"
 			 title="$title"
@@ -163,6 +165,9 @@ function render_video($videoId){
 			>
 				<source src="$videoUrl" type="$mimeType"></source>
 			</video>
+		</div>
+		<div class="video-text-content-container">
+			$textContent
 		</div>
 	EOT;
 }
@@ -182,10 +187,10 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 		return '<div>No video was selected.</div>';
 	}
 	$GithubApi = new GithubAPIService(GITHUB_GRAPH_API_URL);
-	$orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-id', true );
+	$orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-slug', true );
 	
 	if($GithubApi->is_token_valid()){
-		if($GithubApi->is_viewer_sponsor_of_org($videoId)){
+		if($GithubApi->is_viewer_sponsor_of_org($orgId)){
 			//Token seems to be valid, render actual video embed
 			return render_video($videoId);
 		} else {

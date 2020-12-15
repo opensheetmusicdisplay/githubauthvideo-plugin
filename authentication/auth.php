@@ -19,11 +19,11 @@
         exit;
     }
     if($_SERVER['REQUEST_SCHEME'] != 'https'){
-        //echo 'Server must have SSL enabled for Github video Authentication.';
-        //exit;
+        echo 'Server must have SSL enabled for Github video Authentication.';
+        exit;
     }
     //https is required. No option given
-    $REDIRECT_URI = 'http://'. $_SERVER['HTTP_HOST'] . '/github_auth';
+    $REDIRECT_URI = 'https://'. $_SERVER['HTTP_HOST'] . '/github_auth';
 
     //setup JWT configuration used for generating 
     $configuration = Configuration::forSymmetricSigner(

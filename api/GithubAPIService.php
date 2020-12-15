@@ -45,7 +45,7 @@
             } else if (array_key_exists('errors', $result)) {
                 $concatErr = "";
                 for($i = 0; $i < count($result['errors']); $i++){
-                    $concatErr .= '\r\n' . $result['errors'][$i]['message'];
+                    $concatErr .= '<br>' . $result['errors'][$i]['message'];
                 }
                 $returnObject['error'] = TRUE;
                 $returnObject['message'] = 'Error calling Github API. Error(s) from Github: ' . $concatErr;

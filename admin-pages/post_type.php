@@ -70,12 +70,13 @@ function githubauthvideo_register_post_type() {
  * 
  * Retrieving the values:
  * Video Location URI = get_post_meta( get_the_ID(), 'githubauthvideo_video-location-uri', true )
- * Github Organization ID = get_post_meta( get_the_ID(), 'githubauthvideo_github-organization-id', true )
- * Github Sponsorship Tier ID = get_post_meta( get_the_ID(), 'githubauthvideo_github-sponsorship-tier-id', true )
+ * Github Organization Slug = get_post_meta( get_the_ID(), 'githubauthvideo_github-organization-slug', true )
+ * Github Sponsorship Tier ID (Not used yet) = get_post_meta( get_the_ID(), 'githubauthvideo_github-sponsorship-tier-id-not-used-yet', true )
  * Splash Screen = get_post_meta( get_the_ID(), 'githubauthvideo_splash-screen', true )
+ * Video Description = get_post_meta( get_the_ID(), 'githubauthvideo_video-description', true )
  */
 class Github_Video_Entry_Fields {
-	private $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["github-sponsor-video"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"url","label":"Video Location URI","id":"githubauthvideo_video-location-uri"},{"type":"text","label":"Github Organization Slug","id":"githubauthvideo_github-organization-id"},{"type":"text","label":"Github Sponsorship Tier ID (Not used yet)","default":"*","id":"githubauthvideo_github-sponsorship-tier-id"},{"type":"media","label":"Splash Screen","return":"url","id":"githubauthvideo_splash-screen"}]}';
+	private $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["github-sponsor-video"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"url","label":"Video Location URI","id":"githubauthvideo_video-location-uri"},{"type":"text","label":"Github Organization Slug","id":"githubauthvideo_github-organization-slug"},{"type":"text","label":"Github Sponsorship Tier ID (Not used yet)","default":"*","id":"githubauthvideo_github-sponsorship-tier-id-not-used-yet"},{"type":"media","label":"Splash Screen","return":"url","id":"githubauthvideo_splash-screen"},{"type":"editor","label":"Video Description","rows":"10","wpautop":"1","id":"githubauthvideo_video-description"}]}';
 
 	public function __construct() {
 		$this->config = json_decode( $this->config, true );
@@ -149,9 +150,15 @@ class Github_Video_Entry_Fields {
 	public function save_post( $post_id ) {
 		foreach ( $this->config['fields'] as $field ) {
 			switch ( $field['type'] ) {
+				case 'editor':
+					if ( isset( $_POST[ $field['id'] ] ) ) {
+						$sanitized = wp_filter_post_kses( $_POST[ $field['id'] ] );
+						update_post_meta( $post_id, $field['id'], $sanitized );
+					}
+					break;
 				case 'url':
 					if ( isset( $_POST[ $field['id'] ] ) ) {
-						$sanitized = esc_url_raw( $_POST[ $field['id'] ] );
+						$sanitized = esc_url_raw( $_POST[ $field['id'] ], ['http', 'https', 'ftp', 'ftps', 'file'] );
 						update_post_meta( $post_id, $field['id'], $sanitized );
 					}
 					break;
@@ -184,6 +191,9 @@ class Github_Video_Entry_Fields {
 
 	private function label( $field ) {
 		switch ( $field['type'] ) {
+			case 'editor':
+				echo '<div class="">' . $field['label'] . '</div>';
+				break;
 			case 'media':
 				printf(
 					'<label class="" for="%s_button">%s</label>',
@@ -200,6 +210,9 @@ class Github_Video_Entry_Fields {
 
 	private function field( $field ) {
 		switch ( $field['type'] ) {
+			case 'editor':
+				$this->editor( $field );
+				break;
 			case 'media':
 				$this->input( $field );
 				$this->media_button( $field );
@@ -207,6 +220,16 @@ class Github_Video_Entry_Fields {
 			default:
 				$this->input( $field );
 		}
+	}
+
+	private function editor( $field ) {
+		wp_editor( $this->value( $field ), $field['id'], [
+			'wpautop' => isset( $field['wpautop'] ) ? true : false,
+			'media_buttons' => isset( $field['media-buttons'] ) ? true : false,
+			'textarea_name' => $field['id'],
+			'textarea_rows' => isset( $field['rows'] ) ? isset( $field['rows'] ) : 20,
+			'teeny' => isset( $field['teeny'] ) ? true : false
+		] );
 	}
 
 	private function input( $field ) {
@@ -230,7 +253,7 @@ class Github_Video_Entry_Fields {
 			isset( $field['modal-title'] ) ? $field['modal-title'] : __( 'Choose a file', 'githubauthvideo' ),
 			$field['return'],
 			$field['id'], $field['id'],
-			isset( $field['button-text'] ) ? $field['button-text'] : __( 'Upload or Select', 'githubauthvideo' )
+			isset( $field['button-text'] ) ? $field['button-text'] : __( 'Upload', 'githubauthvideo' )
 		);
 	}
 
@@ -248,4 +271,39 @@ class Github_Video_Entry_Fields {
 
 }
 new Github_Video_Entry_Fields;
+
+//Register our video description field to be called by rest so it can be pulled down in the editor
+function rest_githubauthvideo_video_description_post_field( $post, $field_name, $request ) {
+    return get_post_meta( $post[ 'id' ], $field_name, true );
+}
+
+function add_githubauthvideo_video_description_rest_field(){
+	register_rest_field( 'github-sponsor-video',
+		'githubauthvideo_video-description',
+		array(
+			'get_callback'  => 'rest_githubauthvideo_video_description_post_field',
+			'update_callback'   => null,
+			'schema'            => null,
+		)
+	);
+}
+
+add_action( 'rest_api_init', 'add_githubauthvideo_video_description_rest_field' );
+
+function rest_githubauthvideo_splash_screen_post_field( $post, $field_name, $request ) {
+    return get_post_meta( $post[ 'id' ], $field_name, true );
+}
+
+function add_githubauthvideo_video_splash_screen_rest_field(){
+	register_rest_field( 'github-sponsor-video',
+		'githubauthvideo_splash-screen',
+		array(
+			'get_callback'  => 'rest_githubauthvideo_splash_screen_post_field',
+			'update_callback'   => null,
+			'schema'            => null,
+		)
+	);
+}
+
+add_action( 'rest_api_init', 'add_githubauthvideo_video_splash_screen_rest_field' );
 ?>
