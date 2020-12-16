@@ -109,8 +109,8 @@ function render_github_auth($videoId = NULL){
 	$splashUrl = get_splash_image($videoId);
 	$ghIconUrl = esc_url( plugins_url( 'images/github-icon.png', __FILE__ ) );
 	return <<<EOT
-	<div class="video-auth-spash" style="background-image: url('$splashUrl');">
-		<div class="video-auth-splash-cover">
+	<div class="githubvideoauth-video-auth-spash" style="background-image: url('$splashUrl');">
+		<div class="githubvideoauth-video-auth-splash-cover">
 			<a href="$authUrl">
 				<button>
 					<img class="github-icon" src="$ghIconUrl"> <span class="github-button-text">Authenticate with Github</span>
@@ -127,9 +127,9 @@ function render_sponsor($videoId = NULL, $orgId = ''){
 	//TODO: Have reasonable default
 	$sponsorUrl = esc_url('https://github.com/sponsors/' . $orgId);
 	return <<<EOT
-	<div class="video-auth-spash" style="background-image: url('$splashUrl');">
-		<div class="video-auth-splash-cover">
-			<div class="sponsor-message-block">
+	<div class="githubvideoauth-video-auth-spash" style="background-image: url('$splashUrl');">
+		<div class="githubvideoauth-video-auth-splash-cover">
+			<div class="githubvideoauth-sponsor-message-block">
 				<text>Only Github sponsors have access to this video.</text>
 			</div>
 			<br>
@@ -154,9 +154,9 @@ function render_video($videoId){
 	}
 	$mimeType = get_video_mime_type($location);
 	return <<<EOT
-		<h5 class="video-title-container">$title</h5>
-		<div class="video-js-container">
-			<video class="video-js vjs-fluid"
+		<h5 class="githubvideoauth-video-title-container">$title</h5>
+		<div class="githubvideoauth-video-container">
+			<video class="githubvideoauth-video"
 			 title="$title"
 			 alt="$videoId"
 			 controls
@@ -166,7 +166,7 @@ function render_video($videoId){
 				<source src="$videoUrl" type="$mimeType"></source>
 			</video>
 		</div>
-		<div class="video-text-content-container">
+		<div class="githubvideoauth-video-text-content-container">
 			$textContent
 		</div>
 	EOT;

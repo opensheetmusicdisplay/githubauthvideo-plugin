@@ -87,7 +87,7 @@
         } else if (typeof gtag !== 'undefined'){
           callback = handleGtag;
         }
-        const videoList = document.getElementsByClassName('video-js');
+        const videoList = document.getElementsByClassName('githubvideoauth-video');
             for(let i = 0; i < videoList.length; i++){
               let videoEl = videoList[i];
               if(videoEl instanceof HTMLDivElement){

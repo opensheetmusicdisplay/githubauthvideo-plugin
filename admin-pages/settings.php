@@ -93,6 +93,14 @@ class GithubVideoAuthMainSettings {
 			'main-settings-admin', // page
 			'main_settings_setting_section' // section
 		);
+
+		add_settings_field(
+			'do_not_enforce_https_5', // id
+			'Do Not Require HTTPS', // title
+			array( $this, 'do_not_enforce_https_5_callback' ), // callback
+			'main-settings-admin', // page
+			'main_settings_setting_section' // section
+		);
 	}
 
 	public function main_settings_sanitize($input) {
@@ -115,6 +123,10 @@ class GithubVideoAuthMainSettings {
 
 		if ( isset( $input['ignore_sponsorship_4'] ) ) {
 			$sanitary_values['ignore_sponsorship_4'] = $input['ignore_sponsorship_4'];
+		}
+
+		if ( isset( $input['do_not_enforce_https_5'] ) ) {
+			$sanitary_values['do_not_enforce_https_5'] = $input['do_not_enforce_https_5'];
 		}
 		return $sanitary_values;
 	}
@@ -158,6 +170,13 @@ class GithubVideoAuthMainSettings {
 		);
 	}
 
+	public function do_not_enforce_https_5_callback() {
+		printf(
+			'<input type="checkbox" name="main_settings_option_name[do_not_enforce_https_5]" id="do_not_enforce_https_5" value="do_not_enforce_https_5" %s> <label for="do_not_enforce_https_5">Check to ignore whether the server has HTTPS enabled. THIS IS NOT RECOMMENDED FOR SECURITY REASONS.</label>',
+			( isset( $this->main_settings_options['do_not_enforce_https_5'] ) && $this->main_settings_options['do_not_enforce_https_5'] === 'do_not_enforce_https_5' ) ? 'checked' : ''
+		);
+	}
+
 }
 if ( is_admin() )
 	$main_settings = new GithubVideoAuthMainSettings();
@@ -170,6 +189,7 @@ if ( is_admin() )
  * $jwt_private_key_2 = $main_settings_options['jwt_private_key_2']; // Private Key For Session Generation
  * $track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; // Whether we want to enable google analytics or not (needs included already)
  * $ignore_sponsorship_4 = $main_settings_options['ignore_sponsorship_4']; // Whether to track if the user is sponsoring the organization or not for video access
+ * $do_not_enforce_https_5 = $main_settings_options['do_not_enforce_https_5']; // Check to ignore enforcement of HTTPS on the server
  */
 
  ?>

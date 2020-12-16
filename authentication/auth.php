@@ -13,17 +13,23 @@
     $CLIENT_ID = $main_settings_options['github_app_client_id_0']; // Github App Client ID
     $CLIENT_SECRET = $main_settings_options['github_app_client_secret_1']; // Github App Client Secret
     $JWT_PRIVATE_KEY = $main_settings_options['jwt_private_key_2']; // JWT Private Key
+    $DO_NOT_ENFORCE_HTTPS = FALSE;
+    if(array_key_exists('do_not_enforce_https_5', $main_settings_options)){
+        $DO_NOT_ENFORCE_HTTPS = $main_settings_options['do_not_enforce_https_5'];
+    }
+    
 
     if(!isset($CLIENT_ID) || !isset($CLIENT_SECRET) || !isset($JWT_PRIVATE_KEY)) {
         echo 'Github video authentication has not been configured properly. If you are the admin, please register your Github App and set a private key.';
         exit;
     }
-    if($_SERVER['REQUEST_SCHEME'] != 'https'){
+    if($DO_NOT_ENFORCE_HTTPS == FALSE && $_SERVER['REQUEST_SCHEME'] != 'https'){
         echo 'Server must have SSL enabled for Github video Authentication.';
         exit;
     }
-    //https is required. No option given
-    $REDIRECT_URI = 'https://'. $_SERVER['HTTP_HOST'] . '/github_auth';
+    
+    
+    $REDIRECT_URI = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/github_auth';
 
     //setup JWT configuration used for generating 
     $configuration = Configuration::forSymmetricSigner(
