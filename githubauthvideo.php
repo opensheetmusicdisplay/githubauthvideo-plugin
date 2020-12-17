@@ -30,6 +30,7 @@ const GITHUB_OAUTH_TOKEN_URL = 'https://github.com/login/oauth/access_token';
 const VIDEO_JS_URL = 'https://vjs.zencdn.net/7.10.2/video.js';
 const VIDEO_CSS_URL = 'https://vjs.zencdn.net/7.10.2/video-js.css';
 
+include 'api/VideoStream.php';
 include 'admin-pages/settings.php';
 include 'admin-pages/post_type.php';
 include 'authentication/GithubAuthCookies.php';
@@ -109,7 +110,8 @@ function render_github_auth($videoId = NULL){
 	$splashUrl = get_splash_image($videoId);
 	$ghIconUrl = esc_url( plugins_url( 'images/github-icon.png', __FILE__ ) );
 	return <<<EOT
-	<div class="githubvideoauth-video-auth-spash" style="background-image: url('$splashUrl');">
+	<div class="githubvideoauth-video-auth-splash-container">
+		<img src="$splashUrl" class="githubvideoauth-video-auth-splash-image" />
 		<div class="githubvideoauth-video-auth-splash-cover">
 			<a href="$authUrl">
 				<button>
@@ -127,7 +129,8 @@ function render_sponsor($videoId = NULL, $orgId = ''){
 	//TODO: Have reasonable default
 	$sponsorUrl = esc_url('https://github.com/sponsors/' . $orgId);
 	return <<<EOT
-	<div class="githubvideoauth-video-auth-spash" style="background-image: url('$splashUrl');">
+	<div class="githubvideoauth-video-auth-splash-container">
+		<img src="$splashUrl" class="githubvideoauth-video-auth-splash-image" />
 		<div class="githubvideoauth-video-auth-splash-cover">
 			<div class="githubvideoauth-sponsor-message-block">
 				<text>Only Github sponsors have access to this video.</text>

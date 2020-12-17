@@ -53,33 +53,41 @@
         exit;
     } else {
         $location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
+        $scheme = parse_url($location, PHP_URL_SCHEME);
 
-        $mimeType = get_video_mime_type($location);
-        //Prep our response
-        header('Content-Description: File Transfer');
-        //TODO: detect mime type
-        header('Content-Type: ' . $mimeType);
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        //Doesn't matter if we have a file
-        $options = array(
-            'http' => array(
-                'header'  => array("Content-type: text/html",
-                    'Accept: video/*',
-                    'User-Agent: PHP',
-                    'method'  => 'GET'
+        //if it's a local file, do proper streaming
+        if($scheme == 'file'){
+            $stream = new VideoStream($location, get_video_mime_type($location));
+            $stream->start();
+        } else { //otherwise pass through from the URL
+            //TODO: Maybe stream better. Detect stream headers, forward, etc.
+            $headers = get_headers($location, TRUE);
+            //Prep our response
+            header('Content-Description: File Transfer');
+            header('Content-Type: ' . $headers['Content-Type']);
+            header('Cache-Control: max-age=2592000, public');
+            header('Expires: '.gmdate('D, d M Y H:i:s', time()+2592000) . ' GMT');
+            header('Pragma: public');
+            header('Content-Length: '. $headers['Content-Length']);
+            //Doesn't matter if we have a file
+            $options = array(
+                'http' => array(
+                    'header'  => array("Content-type: text/html",
+                        'Accept: video/*',
+                        'User-Agent: PHP',
+                        'method'  => 'GET'
+                    )
                 )
-            )
-        );
-        $context  = stream_context_create($options);
-        $handle = fopen($location, 'r', false, $context);
-        if(!(isset($handle))){
-            header('HTTP/1.0 404 Not Found');
-            echo 'Video file could not be found.';
-            exit;
+            );
+            $context  = stream_context_create($options);
+            $handle = fopen($location, 'r', false, $context);
+            if(!(isset($handle))){
+                header('HTTP/1.0 404 Not Found');
+                echo 'Video file could not be found.';
+                exit;
+            }
+            fpassthru($handle);
+            fclose($handle);
         }
-        fpassthru($handle);
-        fclose($handle);
     }
 ?>

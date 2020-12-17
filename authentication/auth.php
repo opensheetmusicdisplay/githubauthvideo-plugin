@@ -27,9 +27,16 @@
         echo 'Server must have SSL enabled for Github video Authentication.';
         exit;
     }
+
+    $requestScheme = 'https';
+    if($DO_NOT_ENFORCE_HTTPS == TRUE){
+        $requestScheme = 'http';
+    }
+    if(isset($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] != ''){
+        $requestScheme = $_SERVER['REQUEST_SCHEME'];
+    }
     
-    
-    $REDIRECT_URI = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/github_auth';
+    $REDIRECT_URI = $requestScheme . '://' . $_SERVER['HTTP_HOST'] . '/github_auth';
 
     //setup JWT configuration used for generating 
     $configuration = Configuration::forSymmetricSigner(
