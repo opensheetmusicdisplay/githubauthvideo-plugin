@@ -1,5 +1,4 @@
 <?php
-    //TODO: Instead of doing this, just check cookies
     $json = file_get_contents('php://input');
     $request_data = json_decode($json, true);
     $Cookies = GithubAuthCookies::getCookiesInstance();

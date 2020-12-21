@@ -101,6 +101,14 @@ class GithubVideoAuthMainSettings {
 			'main-settings-admin', // page
 			'main_settings_setting_section' // section
 		);
+
+		add_settings_field(
+			'server_side_rendering_6', // id
+			'Use Server-Side Rendering for Player', // title
+			array( $this, 'server_side_rendering_6_callback' ), // callback
+			'main-settings-admin', // page
+			'main_settings_setting_section' // section
+		);
 	}
 
 	public function main_settings_sanitize($input) {
@@ -127,6 +135,10 @@ class GithubVideoAuthMainSettings {
 
 		if ( isset( $input['do_not_enforce_https_5'] ) ) {
 			$sanitary_values['do_not_enforce_https_5'] = $input['do_not_enforce_https_5'];
+		}
+
+		if ( isset( $input['server_side_rendering_6'] ) ) {
+			$sanitary_values['server_side_rendering_6'] = $input['server_side_rendering_6'];
 		}
 		return $sanitary_values;
 	}
@@ -177,6 +189,13 @@ class GithubVideoAuthMainSettings {
 		);
 	}
 
+	public function server_side_rendering_6_callback() {
+		printf(
+			'<input type="checkbox" name="main_settings_option_name[server_side_rendering_6]" id="server_side_rendering_6" value="server_side_rendering_6" %s> <label for="server_side_rendering_6">Check to render the player via the server, or use client-side rendering. If your hosting provider enforced server caching, client-side rendering may be necessary.</label>',
+			( isset( $this->main_settings_options['server_side_rendering_6'] ) && $this->main_settings_options['server_side_rendering_6'] === 'server_side_rendering_6' ) ? 'checked' : ''
+		);
+	}
+
 }
 if ( is_admin() )
 	$main_settings = new GithubVideoAuthMainSettings();
@@ -190,6 +209,7 @@ if ( is_admin() )
  * $track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; // Whether we want to enable google analytics or not (needs included already)
  * $ignore_sponsorship_4 = $main_settings_options['ignore_sponsorship_4']; // Whether to track if the user is sponsoring the organization or not for video access
  * $do_not_enforce_https_5 = $main_settings_options['do_not_enforce_https_5']; // Check to ignore enforcement of HTTPS on the server
+ * $server_side_rendering_6 = $main_settings_options['server_side_rendering_6']; // Whether the server does the rendering or the client
  */
 
  ?>

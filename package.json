@@ -1,22 +1,27 @@
 {
 	"name": "githubauthvideo",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "Video that is behind github oauth prompt. Checks for sponsorship",
 	"author": "Justin Litten",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
 	"scripts": {
-		"build": "wp-scripts build",
+		"wp:build": "wp-scripts build",
+		"player:build": "webpack --progress --colors --config webpack.player.config.js",
+		"build": "npm-run-all wp:build player:build",
+		"start": "wp-scripts start",
 		"format:js": "wp-scripts format-js",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
-		"start": "wp-scripts start",
 		"packages-update": "wp-scripts packages-update"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^12.5.0"
+		"@wordpress/scripts": "^12.5.0",
+		"npm-run-all": "4.1.5"
 	},
 	"dependencies": {
-		"@wordpress/components": "^11.1.3"
+		"@wordpress/components": "^11.1.3",
+		"axios": "^0.21.0",
+		"js-cookie": "^2.2.1"
 	}
 }

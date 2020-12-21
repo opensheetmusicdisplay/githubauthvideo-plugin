@@ -105,3 +105,4 @@ dist
 
 #Composer (PHP) library directory
 vendor/
+deprecated.bak.php

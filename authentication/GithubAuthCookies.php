@@ -70,5 +70,13 @@
                 return 'bearer';
             }
         } 
+
+        public function get_token_type_key(){
+            return $this->token_type_key;
+        }
+
+        public function get_token_key(){
+            return $this->token_key;
+        }
     }
 ?>

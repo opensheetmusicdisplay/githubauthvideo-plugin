@@ -2,6 +2,12 @@
   //This file will only be enqueued if enabled on the settings page.
   class GithubAuthVideoAnalytics {
     constructor(element, callback){
+      this.videoTitle = '';
+      this.videoId = -1;
+      this.element = {};
+      this.eventHandlerCallback = function(){
+      }
+      
       if(element instanceof HTMLVideoElement){
         this.videoTitle = element.getAttribute('title');
         this.videoId = parseInt(element.getAttribute('alt'), 10);
@@ -24,12 +30,6 @@
           self.volumeChanged(event);
         });
       }
-    }
-
-    videoTitle = ''
-    videoId = -1
-    element = {}
-    eventHandlerCallback = function(){
     }
 
     playbackComplete(event){
@@ -104,5 +104,12 @@
         }
       }
     }
-    checkIfAnalyticsLoaded();
+
+    //Need to run if server-side rendering (already complete).
+    //Client-side will be delayed, so need to wait to run.
+    if(githubauthvideo_analytics_js_data.server_side_rendering){
+      checkIfAnalyticsLoaded();
+    } else {
+      window.githubauthvideo_checkIfAnalyticsLoaded = checkIfAnalyticsLoaded;
+    }
 })();

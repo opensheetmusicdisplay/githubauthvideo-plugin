@@ -27,8 +27,6 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 const GITHUB_GRAPH_API_URL = 'https://api.github.com/graphql';
 const GITHUB_OAUTH_BEGIN_URL = 'https://github.com/login/oauth/authorize';
 const GITHUB_OAUTH_TOKEN_URL = 'https://github.com/login/oauth/access_token';
-const VIDEO_JS_URL = 'https://vjs.zencdn.net/7.10.2/video.js';
-const VIDEO_CSS_URL = 'https://vjs.zencdn.net/7.10.2/video-js.css';
 
 include 'api/VideoStream.php';
 include 'admin-pages/settings.php';
@@ -92,85 +90,11 @@ function phonicscore_githubauthvideo_block_init() {
 	) );
 }
 
-function get_splash_image($videoId = NULL){
-	$splashUrl = esc_url( plugins_url( 'images/blur.png', __FILE__ ) );
-	if(isset($videoId)) {
-		$metaSplash =  get_post_meta( $videoId, 'githubauthvideo_splash-screen', true );
-		if(isset($metaSplash) && !empty($metaSplash)){
-			$splashUrl = $metaSplash;
-		}
-	}
-
-	return $splashUrl;
-}
-
-function render_github_auth($videoId = NULL){
-	$returnPath = $_SERVER['REQUEST_URI'];
-	$authUrl = esc_url( '/github_auth?return_path=' . urlencode($returnPath) );
-	$splashUrl = get_splash_image($videoId);
-	$ghIconUrl = esc_url( plugins_url( 'images/github-icon.png', __FILE__ ) );
+function render_video_placeholder($videoId = -1, $orgId = ''){
 	return <<<EOT
-	<div class="githubvideoauth-video-auth-splash-container">
-		<img src="$splashUrl" class="githubvideoauth-video-auth-splash-image" />
-		<div class="githubvideoauth-video-auth-splash-cover">
-			<a href="$authUrl">
-				<button>
-					<img class="github-icon" src="$ghIconUrl"> <span class="github-button-text">Authenticate with Github</span>
-				</button>
-			</a>
-		</div>
-	</div>
-	EOT;
-}
-
-function render_sponsor($videoId = NULL, $orgId = ''){
-	$splashUrl = get_splash_image($videoId);
-	$ghIconUrl = esc_url( plugins_url( 'images/github-icon.png', __FILE__ ) );
-	//TODO: Have reasonable default
-	$sponsorUrl = esc_url('https://github.com/sponsors/' . $orgId);
-	return <<<EOT
-	<div class="githubvideoauth-video-auth-splash-container">
-		<img src="$splashUrl" class="githubvideoauth-video-auth-splash-image" />
-		<div class="githubvideoauth-video-auth-splash-cover">
-			<div class="githubvideoauth-sponsor-message-block">
-				<text>Only Github sponsors have access to this video.</text>
-			</div>
-			<br>
-			<a href="$sponsorUrl" target="_blank">
-				<button>
-					<img class="github-icon" src="$ghIconUrl"> <span class="github-button-text">Become a sponsor now!</span>
-				</button>
-			</a>
-		</div>
-	</div>
-	EOT;
-}
-
-function render_video($videoId){
-	$videoUrl = '/github_auth_video?video_id=' . $videoId;
-	$location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
-	$textContent = get_post_meta( $videoId, 'githubauthvideo_video-description', true );
-	$title = '';
-	$post = get_post($videoId);
-	if($post){
-		$title = $post->post_title;
-	}
-	$mimeType = get_video_mime_type($location);
-	return <<<EOT
-		<h5 class="githubvideoauth-video-title-container">$title</h5>
-		<div class="githubvideoauth-video-container">
-			<video class="githubvideoauth-video"
-			 title="$title"
-			 alt="$videoId"
-			 controls
-			 preload="auto"
-			 data-setup='{}'
-			>
-				<source src="$videoUrl" type="$mimeType"></source>
-			</video>
-		</div>
-		<div class="githubvideoauth-video-text-content-container">
-			$textContent
+		<div class="githubvideoauth-video-placeholder">
+			<input type="hidden" class="videoId" value="$videoId"/>
+			<input type="hidden" class="orgId" value="$orgId"/>
 		</div>
 	EOT;
 }
@@ -181,30 +105,12 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 		return '';
 	}
 	if(!isset($block_attributes['videoId'])){
-		return '<div>No video was selected.</div>';
+		$block_attributes['videoId'] = -1;
 	}
 
 	$videoId = $block_attributes['videoId'];
-
-	if($videoId == -1){
-		return '<div>No video was selected.</div>';
-	}
-	$GithubApi = new GithubAPIService(GITHUB_GRAPH_API_URL);
 	$orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-slug', true );
-	
-	if($GithubApi->is_token_valid()){
-		if($GithubApi->is_viewer_sponsor_of_org($orgId)){
-			//Token seems to be valid, render actual video embed
-			return render_video($videoId);
-		} else {
-			//User auth'd correctly, but is not sponsor of specified organization
-			return render_sponsor($videoId, $orgId);
-		}
-	} else {
-		//User is not auth'd properly
-		return render_github_auth($videoId);
-	}
-	
+	return render_video_placeholder($videoId, $orgId);	
 }
 
 add_action( 'init', 'phonicscore_githubauthvideo_block_init' );
@@ -218,33 +124,74 @@ add_action( 'parse_request', function( $wp ){
         // If we match, means we have a github oauth callback
         include_once plugin_dir_path( __FILE__ ) . 'authentication/auth.php';
         exit; // and exit
-    }
+	} else if ( preg_match( '/video_html/', $uri ) ) { 
+		//Service that provides pre-rendered html for video
+        include_once plugin_dir_path( __FILE__ ) . 'api/serve-player-html.php';
+        exit; // and exit		
+	}
 } );
 
 add_action( 'wp_enqueue_scripts', 'phonicscore_githubauthvideo_block_enqueue_js' );
 function phonicscore_githubauthvideo_block_enqueue_js( ) {
-	//Can't do conditional enqueuing since the block could be embedded on any post
-	/*
-	wp_enqueue_style( 'video-style', VIDEO_CSS_URL, array( ), '7.10.2' );
-    wp_enqueue_script(
-        'video-script',
-        VIDEO_JS_URL,
-        array( ),
-        '7.10.2',
-        true
-	);
-	*/
+	$main_settings_options = get_option( 'main_settings_option_name' );
+
+	$SERVER_SIDE_RENDERING = FALSE;
+	if($main_settings_options && array_key_exists("server_side_rendering_6", $main_settings_options)){
+		$SERVER_SIDE_RENDERING = $main_settings_options['server_side_rendering_6'];
+	}
+
+	//Only enqueue player script if we don't have server-side rendering enabled
+	if(!$SERVER_SIDE_RENDERING){
+		//Can't do conditional enqueuing since the block could be embedded on any post
+		wp_enqueue_script(
+			'githubauthvideo-script',
+			esc_url( plugins_url( 'build/player/player.min.js', __FILE__ ) ),
+			array( ),
+			'1.0.0',
+			true
+		);
+
+		$Cookies = GithubAuthCookies::getCookiesInstance();
+		$IGNORE_SPONSORSHIP = FALSE;
+		if($main_settings_options && array_key_exists("ignore_sponsorship_4", $main_settings_options)){
+			$IGNORE_SPONSORSHIP = $main_settings_options['ignore_sponsorship_4'];
+		}
+	
+		//TODO: Test if we need to pull in the HTML like this and compile w/ handlebars, or if the web service will be sufficient
+		wp_localize_script(
+			'githubauthvideo-script',
+			'githubauthvideo_player_js_data',
+			array(
+				'auth_html' => plugins_url( 'html/auth.html', __FILE__ ),
+				'sponsor_html' => plugins_url( 'html/sponsor.html', __FILE__ ),
+				'video_html' => plugins_url( 'html/video.html', __FILE__ ),
+				'token_key' => $Cookies->get_token_key(),
+				'token_type_key' => $Cookies->get_token_type_key(),
+				'github_api_url' => GITHUB_GRAPH_API_URL,
+				'ignore_sponsorship' => $IGNORE_SPONSORSHIP
+			)
+		);
+	}
+
 	$main_settings_options = get_option( 'main_settings_option_name' ); // Array of All Options
 	if($main_settings_options){
 		$track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; //Google Analytics setting
 		if($track_with_google_analytics_3 == TRUE){	
 			wp_enqueue_script(
-				'video-analytics-script',
-				esc_url( plugins_url( 'frontend_scripts/analytics.js', __FILE__ ) ),
-				array( ),
-				'0.1.0',
+				'githubauthvideo-analytics-script',
+				esc_url( plugins_url( 'build/player/analytics.min.js', __FILE__ ) ),
+				['githubauthvideo-script'],
+				'1.0.0',
 				true
-			);			
+			);
+
+			wp_localize_script(
+				'githubauthvideo-analytics-script',
+				'githubauthvideo_analytics_js_data',
+				array(
+					'server_side_rendering' => $SERVER_SIDE_RENDERING
+				)
+			);
 		}
 	}
 }
