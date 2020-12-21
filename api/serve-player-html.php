@@ -85,7 +85,7 @@
         if(!isset($returnPath)){
             $returnPath = '/';
         }
-        $authUrl = esc_url( '/github_auth?return_path=' . urlencode($returnPath) );
+        $authUrl = esc_url( '/githubauthvideo_auth/1?returnPath=' . urlencode($returnPath) );
         $splashUrl = get_splash_image($videoId);
         $ghIconUrl = esc_url( plugins_url( '../images/github-icon.png', __FILE__ ) );
         return <<<EOT
@@ -126,7 +126,7 @@
     }
 
     function render_video($videoId){
-        $videoUrl = '/github_auth_video?video_id=' . $videoId;
+        $videoUrl = '/githubauthvideo_video/' . $videoId;
         $location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
         $textContent = get_post_meta( $videoId, 'githubauthvideo_video-description', true );
         $title = '';

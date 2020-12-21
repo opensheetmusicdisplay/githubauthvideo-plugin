@@ -115,16 +115,29 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 
 add_action( 'init', 'phonicscore_githubauthvideo_block_init' );
 
+add_action( 'init',  function() {
+	add_rewrite_rule( 'githubauthvideo_video/([0-9]+)[/]?$', 'index.php?githubauthvideo_video=$matches[1]', 'top' );
+	add_rewrite_rule( 'githubauthvideo_auth/([1-2])[/]?(.*)$', 'index.php?githubauthvideo_auth=$matches[1]', 'top' );
+	add_filter( 'query_vars', function( $query_vars ) {
+		$query_vars = ['githubauthvideo_video', 'githubauthvideo_auth', 'code', 'state'];
+		return $query_vars;
+	} );
+
+	flush_rewrite_rules();
+} );
+
+add_action( 'template_include', function( $template ) {
+    if ( get_query_var( 'githubauthvideo_video' ) != false && get_query_var( 'githubauthvideo_video' ) != '' ) {
+		return plugin_dir_path( __FILE__ ) . 'authentication/serve-video.php';
+    } else if ( get_query_var( 'githubauthvideo_auth' ) != false && get_query_var( 'githubauthvideo_auth' ) != '' ) {
+		return plugin_dir_path( __FILE__ ) . 'authentication/auth.php';
+	}
+	return $template;
+} );
+
 add_action( 'parse_request', function( $wp ){
 	$uri = $_SERVER['REQUEST_URI'];
-	if ( preg_match( '/github_auth_video/', $uri ) ) {
-        include_once plugin_dir_path( __FILE__ ) . 'authentication/serve-video.php';
-        exit; // and exit
-	} else if ( preg_match( '/github_auth/', $uri ) ) {
-        // If we match, means we have a github oauth callback
-        include_once plugin_dir_path( __FILE__ ) . 'authentication/auth.php';
-        exit; // and exit
-	} else if ( preg_match( '/video_html/', $uri ) ) { 
+	if ( preg_match( '/video_html/', $uri ) ) { 
 		//Service that provides pre-rendered html for video
         include_once plugin_dir_path( __FILE__ ) . 'api/serve-player-html.php';
         exit; // and exit		

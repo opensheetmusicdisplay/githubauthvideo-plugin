@@ -1,6 +1,6 @@
 <?php
-    $json = file_get_contents('php://input');
-    $request_data = json_decode($json, true);
+    //$json = file_get_contents('php://input');
+    //$request_data = json_decode($json, true);
     $Cookies = GithubAuthCookies::getCookiesInstance();
 
     $token = $Cookies->get_token();
@@ -13,15 +13,15 @@
 
     $tokenType = $Cookies->get_token_type();
 
-    $videoId = NULL;
+    $videoId = get_query_var( 'githubauthvideo_video' );
 
-    if($request_data !== null && array_key_exists('video_id', $request_data) && isset($request_data['video_id'])){
+   /* if($request_data !== null && array_key_exists('video_id', $request_data) && isset($request_data['video_id'])){
         $videoId = $request_data['video_id'];
     } else if(array_key_exists('video_id', $_POST)){
         $videoId = $_POST['video_id'];
     } else if(array_key_exists('video_id', $_GET)){
         $videoId = $_GET['video_id'];
-    }
+    }*/
 
     if(!isset($videoId)){
         header('HTTP/1.0 400 Bad Request');

@@ -36,7 +36,7 @@
         $requestScheme = $_SERVER['REQUEST_SCHEME'];
     }
     
-    $REDIRECT_URI = $requestScheme . '://' . $_SERVER['HTTP_HOST'] . '/github_auth';
+    $REDIRECT_URI = $requestScheme . '://' . $_SERVER['HTTP_HOST'] . '/githubauthvideo_auth/2';
 
     //setup JWT configuration used for generating 
     $configuration = Configuration::forSymmetricSigner(
@@ -44,14 +44,13 @@
         InMemory::base64Encoded($JWT_PRIVATE_KEY)
     );
     $Cookies = GithubAuthCookies::getCookiesInstance();
+    $step = get_query_var( 'githubauthvideo_auth', 1);
+    $githubAuthCode = get_query_var('code', NULL);
     //No Code present. Means we are just beginning the auth flow.
-    if(!array_key_exists('code', $_GET)){
+    if($step == 1 || !isset($githubAuthCode)){
         //Void out auth cookies
         $Cookies->void_auth_cookies();
-        $returnPath = '/';
-        if(array_key_exists('return_path', $_GET)){
-            $returnPath = urldecode($_GET['return_path']);
-        }
+        $returnPath = urldecode(get_query_var('return_path', '/'));
         //generate state with JWT
         $now   = new DateTimeImmutable();
         $token = $configuration->builder()
@@ -85,13 +84,11 @@
         die();        
         exit;
     } else { //Else, code query param is set. Coming back from Github
-        $code = $_GET['code'];
-
-        if(!array_key_exists('state', $_GET)){
+        $state = get_query_var('state', NULL);
+        if(!isset($state)){
             echo '"state" query parameter is missing. Authentication failed.';
             exit;
         }
-        $state = $_GET['state'];
         try {
             //Verify the state provided (JWT Token)
             $stateToken = $configuration->parser()->parse($state);
@@ -117,7 +114,7 @@
         }
     
         $data = array('client_id' => $CLIENT_ID, 'client_secret' => $CLIENT_SECRET,
-                        'code' => $code, 'state' => $state, 'redirect_uri' => $REDIRECT_URI);
+                        'code' => $githubAuthCode, 'state' => $state, 'redirect_uri' => $REDIRECT_URI);
         
         // use key 'http' even if you send the request to https://...
         $options = array(
