@@ -33,8 +33,8 @@ function renderPlaceholders(type, token, tokenType){
                         orgId = orgInput.getAttribute('value');
                     }
                     if(!orgId || orgId.length === 0){
-                        currentPlaceholder.outerHTML = '<div>No Org Id Specified.</div>';
-                        currentReject("No Org ID Specified.");
+                        currentPlaceholder.outerHTML = '<div>No Github Organization Specified for This Video.</div>';
+                        currentReject("No Github Organization Specified for This Video.");
                     } else {
                         const ql = 'query {' +
                             'organization(login: "' + orgId + '") {' +
@@ -49,7 +49,7 @@ function renderPlaceholders(type, token, tokenType){
                                 currentReject(response.message);
                             } else { 
                                 if(response.data.data.organization.viewerIsSponsoring){
-                                    axios.post('/video_html', {
+                                    axios.post(githubauthvideo_player_js_data.video_html_url, {
                                         video_id: videoId,
                                         render_type: 'video'
                                     }).then(function(response){
@@ -60,7 +60,7 @@ function renderPlaceholders(type, token, tokenType){
                                         currentReject(error);
                                     });
                                 } else {
-                                    axios.post('/video_html', {
+                                    axios.post(githubauthvideo_player_js_data.video_html_url, {
                                         video_id: videoId,
                                         render_type: 'sponsor'
                                     }).then(function(response){
@@ -80,7 +80,7 @@ function renderPlaceholders(type, token, tokenType){
                         });
                     }
                 } else {//Regular render.
-                    axios.post('/video_html', {
+                    axios.post(githubauthvideo_player_js_data.video_html_url, {
                         video_id: videoId,
                         render_type: type,
                         return_path: returnPath

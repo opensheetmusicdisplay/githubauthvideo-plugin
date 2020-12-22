@@ -95,6 +95,7 @@
               }
               new GithubAuthVideoAnalytics(videoEl, callback);
             }
+            console.info("Video Analytics Started");
       } else {
         // Retry
         if(checkCount++ < CHECK_MAX){

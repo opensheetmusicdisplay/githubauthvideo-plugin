@@ -191,7 +191,7 @@ class GithubVideoAuthMainSettings {
 
 	public function server_side_rendering_6_callback() {
 		printf(
-			'<input type="checkbox" name="main_settings_option_name[server_side_rendering_6]" id="server_side_rendering_6" value="server_side_rendering_6" %s> <label for="server_side_rendering_6">Check to render the player via the server, or use client-side rendering. If your hosting provider enforced server caching, client-side rendering may be necessary.</label>',
+			'<input type="checkbox" name="main_settings_option_name[server_side_rendering_6]" id="server_side_rendering_6" value="server_side_rendering_6" %s> <label for="server_side_rendering_6">Check to render the player via the server.  Uncheck use JS client-side rendering. If your hosting provider enforces server caching, client-side rendering may be necessary.</label>',
 			( isset( $this->main_settings_options['server_side_rendering_6'] ) && $this->main_settings_options['server_side_rendering_6'] === 'server_side_rendering_6' ) ? 'checked' : ''
 		);
 	}
