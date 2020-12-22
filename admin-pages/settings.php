@@ -170,14 +170,14 @@ class GithubVideoAuthMainSettings {
 
 	public function track_with_google_analytics_3_callback() {
 		printf(
-			'<input type="checkbox" name="main_settings_option_name[track_with_google_analytics_3]" id="track_with_google_analytics_3" value="track_with_google_analytics_3" %s> <label for="track_with_google_analytics_3">If GA is added to the front-end, the player can automatically track playback events to it.</label>',
+			'<input type="checkbox" name="main_settings_option_name[track_with_google_analytics_3]" id="track_with_google_analytics_3" value="track_with_google_analytics_3" %s> <label for="track_with_google_analytics_3">If GA is added to the front-end, the player can automatically track playback events to it.</label><br><sub>NOTE: You may need to clear the server-side cache when toggling this setting.</sub>',
 			( isset( $this->main_settings_options['track_with_google_analytics_3'] ) && $this->main_settings_options['track_with_google_analytics_3'] === 'track_with_google_analytics_3' ) ? 'checked' : ''
 		);
 	}
 
 	public function ignore_sponsorship_4_callback() {
 		printf(
-			'<input type="checkbox" name="main_settings_option_name[ignore_sponsorship_4]" id="ignore_sponsorship_4" value="ignore_sponsorship_4" %s> <label for="ignore_sponsorship_4">Check to ignore whether the user is a sponsor of the specified organization. Just Github authentication will grant them access.</label>',
+			'<input type="checkbox" name="main_settings_option_name[ignore_sponsorship_4]" id="ignore_sponsorship_4" value="ignore_sponsorship_4" %s> <label for="ignore_sponsorship_4">Check to ignore whether the user is a sponsor of the specified organization. Just Github authentication will grant them access.</label><br><sub>NOTE: You may need to clear the server-side cache when toggling this setting.</sub>',
 			( isset( $this->main_settings_options['ignore_sponsorship_4'] ) && $this->main_settings_options['ignore_sponsorship_4'] === 'ignore_sponsorship_4' ) ? 'checked' : ''
 		);
 	}
@@ -191,7 +191,7 @@ class GithubVideoAuthMainSettings {
 
 	public function server_side_rendering_6_callback() {
 		printf(
-			'<input type="checkbox" name="main_settings_option_name[server_side_rendering_6]" id="server_side_rendering_6" value="server_side_rendering_6" %s> <label for="server_side_rendering_6">Check to render the player via the server.  Uncheck use JS client-side rendering. If your hosting provider enforces server caching, client-side rendering may be necessary.</label>',
+			'<input type="checkbox" name="main_settings_option_name[server_side_rendering_6]" id="server_side_rendering_6" value="server_side_rendering_6" %s> <label for="server_side_rendering_6">Check to render the player via the server.  Uncheck use JS client-side rendering. If your hosting provider enforces server caching, client-side rendering may be necessary.</label><br><sub>NOTE: You may need to clear the server-side cache when toggling this setting.</sub>',
 			( isset( $this->main_settings_options['server_side_rendering_6'] ) && $this->main_settings_options['server_side_rendering_6'] === 'server_side_rendering_6' ) ? 'checked' : ''
 		);
 	}

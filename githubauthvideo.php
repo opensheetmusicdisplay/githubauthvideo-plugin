@@ -141,7 +141,7 @@ add_action( 'init',  function() {
 	add_rewrite_rule( 'githubauthvideo_video/([0-9]+)[/]?$', 'index.php?githubauthvideo_video=$matches[1]', 'top' );
 	add_rewrite_rule( 'githubauthvideo_auth/([1-2])[/]?(.*)$', 'index.php?githubauthvideo_auth=$matches[1]', 'top' );
 	add_filter( 'query_vars', function( $query_vars ) {
-		$query_vars = ['githubauthvideo_video', 'githubauthvideo_auth', 'githubauthvideo_video_html', 'code', 'state'];
+		array_push($query_vars, 'githubauthvideo_video', 'githubauthvideo_auth', 'githubauthvideo_video_html', 'code', 'state', 'return_path');
 		return $query_vars;
 	} );
 

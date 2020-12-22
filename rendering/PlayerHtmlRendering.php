@@ -27,7 +27,7 @@
         }
 
         public function get_auth_html(){
-            $authUrl = esc_url( '/githubauthvideo_auth/1?returnPath=' . urlencode($this->RETURN_PATH) );
+            $authUrl = esc_url( '/githubauthvideo_auth/1?return_path=' . urlencode($this->RETURN_PATH) );
             $splashUrl = $this->get_splash_image();
             $ghIconUrl = esc_url( plugins_url( '../images/github-icon.png', __FILE__ ) );
             return <<<EOT
@@ -98,6 +98,7 @@
         public function get_video_placeholder_html(){
             return <<<EOT
                 <div class="githubvideoauth-video-placeholder">
+                    <div class="loader">Loading...</div>
                     <input type="hidden" class="videoId" value="$this->VIDEO_ID"/>
                     <input type="hidden" class="orgId" value="$this->ORG_ID"/>
                 </div>
