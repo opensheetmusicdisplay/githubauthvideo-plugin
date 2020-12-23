@@ -29,8 +29,6 @@ const GITHUB_OAUTH_BEGIN_URL = 'https://github.com/login/oauth/authorize';
 const GITHUB_OAUTH_TOKEN_URL = 'https://github.com/login/oauth/access_token';
 
 include 'api/VideoStream.php';
-include 'admin-pages/settings.php';
-include 'admin-pages/post_type.php';
 include 'authentication/GithubAuthCookies.php';
 include 'api/GithubAPIService.php';
 include 'rendering/PlayerHtmlRendering.php';
@@ -134,32 +132,6 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 	}
 }
 
-add_action( 'init', 'phonicscore_githubauthvideo_block_init' );
-
-add_action( 'init',  function() {
-	add_rewrite_rule( 'githubauthvideo_video_html[/]?$', 'index.php?githubauthvideo_video_html=1', 'top' );
-	add_rewrite_rule( 'githubauthvideo_video/([0-9]+)[/]?$', 'index.php?githubauthvideo_video=$matches[1]', 'top' );
-	add_rewrite_rule( 'githubauthvideo_auth/([1-2])[/]?(.*)$', 'index.php?githubauthvideo_auth=$matches[1]', 'top' );
-	add_filter( 'query_vars', function( $query_vars ) {
-		array_push($query_vars, 'githubauthvideo_video', 'githubauthvideo_auth', 'githubauthvideo_video_html', 'code', 'state', 'return_path');
-		return $query_vars;
-	} );
-
-	flush_rewrite_rules();
-} );
-
-add_action( 'template_include', function( $template ) {
-    if ( get_query_var( 'githubauthvideo_video' ) != false && get_query_var( 'githubauthvideo_video' ) != '' ) {
-		return plugin_dir_path( __FILE__ ) . 'authentication/serve-video.php';
-    } else if ( get_query_var( 'githubauthvideo_auth' ) != false && get_query_var( 'githubauthvideo_auth' ) != '' ) {
-		return plugin_dir_path( __FILE__ ) . 'authentication/auth.php';
-	}  else if ( get_query_var( 'githubauthvideo_video_html' ) != false && get_query_var( 'githubauthvideo_video_html' ) != '' ) {
-		return plugin_dir_path( __FILE__ ) . 'api/serve-player-html.php';
-	}
-	return $template;
-} );
-
-add_action( 'wp_enqueue_scripts', 'phonicscore_githubauthvideo_block_enqueue_js' );
 function phonicscore_githubauthvideo_block_enqueue_js( ) {
 	$main_settings_options = get_option( 'main_settings_option_name' );
 
@@ -234,5 +206,54 @@ function enqueue_editor_assets(){
 		)
 	);
 }
+
+function githubauthvideo_setup_rewrite_rules(){
+	add_rewrite_rule( 'githubauthvideo_video_html[/]?$', 'index.php?githubauthvideo_video_html=1', 'top' );
+	add_rewrite_rule( 'githubauthvideo_video/([0-9]+)[/]?$', 'index.php?githubauthvideo_video=$matches[1]', 'top' );
+	add_rewrite_rule( 'githubauthvideo_auth/([1-2])[/]?(.*)$', 'index.php?githubauthvideo_auth=$matches[1]', 'top' );
+	add_filter( 'query_vars', function( $query_vars ) {
+		array_push($query_vars, 'githubauthvideo_video', 'githubauthvideo_auth', 'githubauthvideo_video_html', 'code', 'state', 'return_path');
+		return $query_vars;
+	} );
+
+	add_action( 'template_include', function( $template ) {
+		if ( get_query_var( 'githubauthvideo_video' ) != false && get_query_var( 'githubauthvideo_video' ) != '' ) {
+			return plugin_dir_path( __FILE__ ) . 'authentication/serve-video.php';
+		} else if ( get_query_var( 'githubauthvideo_auth' ) != false && get_query_var( 'githubauthvideo_auth' ) != '' ) {
+			return plugin_dir_path( __FILE__ ) . 'authentication/auth.php';
+		}  else if ( get_query_var( 'githubauthvideo_video_html' ) != false && get_query_var( 'githubauthvideo_video_html' ) != '' ) {
+			return plugin_dir_path( __FILE__ ) . 'api/serve-player-html.php';
+		}
+		return $template;
+	} );
+}
+
+function githubauthvideo_activate() { 
+    // Register rewrite rules
+    githubauthvideo_setup_rewrite_rules(); 
+    // reset permalinks
+    flush_rewrite_rules(); 
+}
+register_activation_hook( __FILE__, 'githubauthvideo_activate' );
+
+function githubauthvideo_deactivate(){
+	unregister_post_type('github-sponsor-video');
+
+	flush_rewrite_rules();
+}
+register_deactivation_hook(__FILE__, 'githubauthvideo_deactive' );
+
+function githubauthvideo_uninstall(){
+	githubauthvideo_deactivate();
+	delete_option();
+}
+
+register_uninstall_hook(__FILE__, 'githubauthvideo_uninstall');
+
+include 'admin-pages/settings.php';
+include 'admin-pages/post_type.php';
+add_action( 'init', 'phonicscore_githubauthvideo_block_init' );
+add_action( 'init',  'githubauthvideo_setup_rewrite_rules' );
+add_action( 'wp_enqueue_scripts', 'phonicscore_githubauthvideo_block_enqueue_js' );
 add_action('admin_enqueue_scripts', 'enqueue_editor_assets');
 ?>
