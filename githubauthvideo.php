@@ -241,7 +241,7 @@ function githubauthvideo_deactivate(){
 
 	flush_rewrite_rules();
 }
-register_deactivation_hook(__FILE__, 'githubauthvideo_deactive' );
+register_deactivation_hook(__FILE__, 'githubauthvideo_deactivate' );
 
 function githubauthvideo_uninstall(){
 	githubauthvideo_deactivate();
