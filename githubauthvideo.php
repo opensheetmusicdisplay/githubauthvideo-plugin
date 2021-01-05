@@ -102,7 +102,7 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 	$returnPath = $_SERVER['REQUEST_URI'];
 	$renderer = new PlayerHtmlRenderer($videoId, $orgId, $returnPath);
 
-	$main_settings_options = get_option( 'main_settings_option_name' );
+	$main_settings_options = get_option( 'githubauthvideo_main_settings' );
 	$SERVER_SIDE_RENDERING = FALSE;
 	if($main_settings_options && array_key_exists("server_side_rendering_6", $main_settings_options)){
 		$SERVER_SIDE_RENDERING = $main_settings_options['server_side_rendering_6'];
@@ -133,7 +133,7 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 }
 
 function phonicscore_githubauthvideo_block_enqueue_js( ) {
-	$main_settings_options = get_option( 'main_settings_option_name' );
+	$main_settings_options = get_option( 'githubauthvideo_main_settings' );
 
 	$SERVER_SIDE_RENDERING = FALSE;
 	if($main_settings_options && array_key_exists("server_side_rendering_6", $main_settings_options)){
@@ -174,7 +174,7 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
 		);
 	}
 
-	$main_settings_options = get_option( 'main_settings_option_name' ); // Array of All Options
+	$main_settings_options = get_option( 'githubauthvideo_main_settings' ); // Array of All Options
 	if($main_settings_options){
 		$track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; //Google Analytics setting
 		if($track_with_google_analytics_3 == TRUE){	
@@ -244,8 +244,12 @@ function githubauthvideo_deactivate(){
 register_deactivation_hook(__FILE__, 'githubauthvideo_deactivate' );
 
 function githubauthvideo_uninstall(){
-	githubauthvideo_deactivate();
-	delete_option();
+	delete_option('githubauthvideo_main_settings');
+	$github_videos = get_posts( array( 'post_type' => 'github-sponsor-video', 'numberposts' => -1));
+	foreach( $github_videos as $video ) {
+		wp_delete_post( $video->ID, false);
+	}
+   githubauthvideo_deactivate();
 }
 
 register_uninstall_hook(__FILE__, 'githubauthvideo_uninstall');

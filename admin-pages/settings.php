@@ -23,7 +23,7 @@ class GithubVideoAuthMainSettings {
 	}
 
 	public function main_settings_create_admin_page() {
-		$this->main_settings_options = get_option( 'main_settings_option_name' ); ?>
+		$this->main_settings_options = get_option( 'githubauthvideo_main_settings' ); ?>
 
 		<div class="wrap">
 			<h2>Plugin Settings</h2>
@@ -43,7 +43,7 @@ class GithubVideoAuthMainSettings {
 	public function main_settings_page_init() {
 		register_setting(
 			'main_settings_option_group', // option_group
-			'main_settings_option_name', // option_name
+			'githubauthvideo_main_settings', // option_name
 			array( $this, 'main_settings_sanitize' ) // sanitize_callback
 		);
 
@@ -149,49 +149,49 @@ class GithubVideoAuthMainSettings {
 
 	public function github_app_client_id_0_callback() {
 		printf(
-			'<input class="regular-text" type="text" name="main_settings_option_name[github_app_client_id_0]" id="github_app_client_id_0" value="%s">',
+			'<input class="regular-text" type="text" name="githubauthvideo_main_settings[github_app_client_id_0]" id="github_app_client_id_0" value="%s">',
 			isset( $this->main_settings_options['github_app_client_id_0'] ) ? esc_attr( $this->main_settings_options['github_app_client_id_0']) : ''
 		);
 	}
 
 	public function github_app_client_secret_1_callback() {
 		printf(
-			'<input class="regular-text" type="text" name="main_settings_option_name[github_app_client_secret_1]" id="github_app_client_secret_1" value="%s">',
+			'<input class="regular-text" type="text" name="githubauthvideo_main_settings[github_app_client_secret_1]" id="github_app_client_secret_1" value="%s">',
 			isset( $this->main_settings_options['github_app_client_secret_1'] ) ? esc_attr( $this->main_settings_options['github_app_client_secret_1']) : ''
 		);
 	}
 
 	public function jwt_private_key_2_callback() {
 		printf(
-			'<input class="regular-text" type="text" name="main_settings_option_name[jwt_private_key_2]" id="jwt_private_key_2" value="%s">',
+			'<input class="regular-text" type="text" name="githubauthvideo_main_settings[jwt_private_key_2]" id="jwt_private_key_2" value="%s">',
 			isset( $this->main_settings_options['jwt_private_key_2'] ) ? esc_attr( $this->main_settings_options['jwt_private_key_2']) : ''
 		);
 	}
 
 	public function track_with_google_analytics_3_callback() {
 		printf(
-			'<input type="checkbox" name="main_settings_option_name[track_with_google_analytics_3]" id="track_with_google_analytics_3" value="track_with_google_analytics_3" %s> <label for="track_with_google_analytics_3">If GA is added to the front-end, the player can automatically track playback events to it.</label><br><sub>NOTE: You may need to clear the server-side cache when toggling this setting.</sub>',
+			'<input type="checkbox" name="githubauthvideo_main_settings[track_with_google_analytics_3]" id="track_with_google_analytics_3" value="track_with_google_analytics_3" %s> <label for="track_with_google_analytics_3">If GA is added to the front-end, the player can automatically track playback events to it.</label><br><sub>NOTE: You may need to clear the server-side cache when toggling this setting.</sub>',
 			( isset( $this->main_settings_options['track_with_google_analytics_3'] ) && $this->main_settings_options['track_with_google_analytics_3'] === 'track_with_google_analytics_3' ) ? 'checked' : ''
 		);
 	}
 
 	public function ignore_sponsorship_4_callback() {
 		printf(
-			'<input type="checkbox" name="main_settings_option_name[ignore_sponsorship_4]" id="ignore_sponsorship_4" value="ignore_sponsorship_4" %s> <label for="ignore_sponsorship_4">Check to ignore whether the user is a sponsor of the specified organization. Just Github authentication will grant them access.</label><br><sub>NOTE: You may need to clear the server-side cache when toggling this setting.</sub>',
+			'<input type="checkbox" name="githubauthvideo_main_settings[ignore_sponsorship_4]" id="ignore_sponsorship_4" value="ignore_sponsorship_4" %s> <label for="ignore_sponsorship_4">Check to ignore whether the user is a sponsor of the specified organization. Just Github authentication will grant them access.</label><br><sub>NOTE: You may need to clear the server-side cache when toggling this setting.</sub>',
 			( isset( $this->main_settings_options['ignore_sponsorship_4'] ) && $this->main_settings_options['ignore_sponsorship_4'] === 'ignore_sponsorship_4' ) ? 'checked' : ''
 		);
 	}
 
 	public function do_not_enforce_https_5_callback() {
 		printf(
-			'<input type="checkbox" name="main_settings_option_name[do_not_enforce_https_5]" id="do_not_enforce_https_5" value="do_not_enforce_https_5" %s> <label for="do_not_enforce_https_5">Check to ignore whether the server has HTTPS enabled. THIS IS NOT RECOMMENDED FOR SECURITY REASONS.</label>',
+			'<input type="checkbox" name="githubauthvideo_main_settings[do_not_enforce_https_5]" id="do_not_enforce_https_5" value="do_not_enforce_https_5" %s> <label for="do_not_enforce_https_5">Check to ignore whether the server has HTTPS enabled. THIS IS NOT RECOMMENDED FOR SECURITY REASONS.</label>',
 			( isset( $this->main_settings_options['do_not_enforce_https_5'] ) && $this->main_settings_options['do_not_enforce_https_5'] === 'do_not_enforce_https_5' ) ? 'checked' : ''
 		);
 	}
 
 	public function server_side_rendering_6_callback() {
 		printf(
-			'<input type="checkbox" name="main_settings_option_name[server_side_rendering_6]" id="server_side_rendering_6" value="server_side_rendering_6" %s> <label for="server_side_rendering_6">Check to render the player via the server.  Uncheck use JS client-side rendering. If your hosting provider enforces server caching, client-side rendering may be necessary.</label><br><sub>NOTE: You may need to clear the server-side cache when toggling this setting.</sub>',
+			'<input type="checkbox" name="githubauthvideo_main_settings[server_side_rendering_6]" id="server_side_rendering_6" value="server_side_rendering_6" %s> <label for="server_side_rendering_6">Check to render the player via the server.  Uncheck use JS client-side rendering. If your hosting provider enforces server caching, client-side rendering may be necessary.</label><br><sub>NOTE: You may need to clear the server-side cache when toggling this setting.</sub>',
 			( isset( $this->main_settings_options['server_side_rendering_6'] ) && $this->main_settings_options['server_side_rendering_6'] === 'server_side_rendering_6' ) ? 'checked' : ''
 		);
 	}
@@ -202,7 +202,7 @@ if ( is_admin() )
 
 /* 
  * Retrieve this value with:
- * $main_settings_options = get_option( 'main_settings_option_name' ); // Array of All Options
+ * $main_settings_options = get_option( 'githubauthvideo_main_settings' ); // Array of All Options
  * $github_app_client_id_0 = $main_settings_options['github_app_client_id_0']; // Github App Client ID
  * $github_app_client_secret_1 = $main_settings_options['github_app_client_secret_1']; // Github App Client Secret
  * $jwt_private_key_2 = $main_settings_options['jwt_private_key_2']; // Private Key For Session Generation

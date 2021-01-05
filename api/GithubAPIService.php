@@ -11,7 +11,7 @@
             $this->TOKEN = $Cookies->get_token();
             $this->TOKEN_TYPE = $Cookies->get_token_type();
             $this->GRAPH_API_URL = $graphApiUrl;
-            $main_settings_options = get_option( 'main_settings_option_name' ); // Array of All Options
+            $main_settings_options = get_option( 'githubauthvideo_main_settings' ); // Array of All Options
             if($main_settings_options && array_key_exists("ignore_sponsorship_4", $main_settings_options)){
                 $this->IGNORE_SPONSORSHIP = $main_settings_options['ignore_sponsorship_4']; // Whether to track if the user is sponsoring the organization or not for video access
             }

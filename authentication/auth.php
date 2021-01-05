@@ -5,7 +5,7 @@
     use Lcobucci\JWT\Signer\Key\InMemory;
     use Lcobucci\JWT\Token\Plain;
 
-    $main_settings_options = get_option( 'main_settings_option_name' ); // Array of All Options
+    $main_settings_options = get_option( 'githubauthvideo_main_settings' ); // Array of All Options
     if(!$main_settings_options){
         echo 'Github video authentication has not been configured properly. If you are the admin, please register your Github App and set a private key.';
         exit;

@@ -12,7 +12,7 @@
             $this->token_key = 'githubauthvideo_' . $this->domain . '_token';
             $this->token_type_key = 'githubauthvideo_' . $this->domain . '_token_type';
             $this->cookie_domain = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
-            $main_settings_options = get_option( 'main_settings_option_name' ); // Array of All Options
+            $main_settings_options = get_option( 'githubauthvideo_main_settings' ); // Array of All Options
             $this->secure_cookie = TRUE;
             $do_not_enforce_https = FALSE;
             if(array_key_exists('do_not_enforce_https_5', $main_settings_options)){
