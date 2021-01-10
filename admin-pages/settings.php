@@ -13,20 +13,38 @@ class GithubVideoAuthMainSettings {
 	}
 
 	public function main_settings_add_plugin_page() {
+		add_menu_page(
+			'Github Sponsor Video Plugin',
+			'Github Video',
+			'manage_options',
+			'githubauthvideo',
+			null,
+			'dashicons-format-video',
+			null
+		);
+		add_submenu_page(
+			'githubauthvideo',
+            'Github Sponsor Video Plugin Settings',
+            'Settings',
+            'manage_options',
+            'githubauthvideo_settings',
+			array( $this, 'main_settings_create_admin_page' )
+		);
+		/*
 		add_options_page(
             'Github Sponsor Video',
             'Github Sponsor Video Plugin',
             'manage_options',
             'githubauthvideo',
 			array( $this, 'main_settings_create_admin_page' ) // function
-		);
+		);*/
 	}
 
 	public function main_settings_create_admin_page() {
 		$this->main_settings_options = get_option( 'githubauthvideo_main_settings' ); ?>
 
 		<div class="wrap">
-			<h2>Plugin Settings</h2>
+			<h2>Github Sponsor Video Plugin Settings</h2>
 			<p></p>
 			<?php settings_errors(); ?>
 

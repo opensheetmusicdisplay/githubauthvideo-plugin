@@ -33,7 +33,7 @@ function githubauthvideo_register_post_type() {
 		'query_var'           => false,
 		'can_export'          => true,
 		'rewrite_no_front'    => false,
-		'show_in_menu'        => 'upload.php',
+		'show_in_menu'        => 'githubauthvideo',
 		'menu_icon'           => 'dashicons-video-alt2',
 		'supports' => [
 			'title',
@@ -76,7 +76,7 @@ function githubauthvideo_register_post_type() {
  * Video Description = get_post_meta( get_the_ID(), 'githubauthvideo_video-description', true )
  */
 class Github_Video_Entry_Fields {
-	private $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["github-sponsor-video"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"url","label":"Video Location URI","id":"githubauthvideo_video-location-uri"},{"type":"text","label":"Github Organization Slug","id":"githubauthvideo_github-organization-slug"},{"type":"text","label":"Github Sponsorship Tier ID (Not used yet)","default":"*","id":"githubauthvideo_github-sponsorship-tier-id-not-used-yet"},{"type":"media","label":"Splash Screen","return":"url","id":"githubauthvideo_splash-screen"},{"type":"editor","label":"Video Description","rows":"10","wpautop":"1","id":"githubauthvideo_video-description"}]}';
+	private $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["github-sponsor-video"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"media","return": "id","label":"Media ID <em>or</em> Video Location URI","id":"githubauthvideo_video-location-uri"},{"type":"text","label":"Github Organization Slug","id":"githubauthvideo_github-organization-slug"},{"type":"text","label":"Github Sponsorship Tier ID (Not used yet)","default":"*","id":"githubauthvideo_github-sponsorship-tier-id-not-used-yet"},{"type":"media","label":"Splash Screen","return":"url","id":"githubauthvideo_splash-screen"},{"type":"editor","label":"Unauthenticated Video Description","rows":"10","wpautop":"1","id":"githubauthvideo_video-unauthenticated-description"},{"type":"editor","label":"Authenticated Video Description","rows":"10","wpautop":"1","id":"githubauthvideo_video-description"}]}';
 
 	public function __construct() {
 		$this->config = json_decode( $this->config, true );

@@ -15,7 +15,7 @@
             $main_settings_options = get_option( 'githubauthvideo_main_settings' ); // Array of All Options
             $this->secure_cookie = TRUE;
             $do_not_enforce_https = FALSE;
-            if(array_key_exists('do_not_enforce_https_5', $main_settings_options)){
+            if($main_settings_options && array_key_exists('do_not_enforce_https_5', $main_settings_options)){
                 $do_not_enforce_https = $main_settings_options['do_not_enforce_https_5'];
             }
 

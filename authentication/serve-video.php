@@ -52,8 +52,15 @@
         exit;
     } else {
         $location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
-        $scheme = parse_url($location, PHP_URL_SCHEME);
-
+        $mediaId = intval($location);
+        $scheme = '';
+        if(!$mediaId){
+            $scheme = parse_url($location, PHP_URL_SCHEME);
+        } else {
+            //If we are using a locally hosted file, get the file path instead so we aren't using extra bandwidth
+            $location = get_attached_file($mediaId);
+            $scheme = 'file';
+        }        
         //if it's a local file, do proper streaming
         if($scheme == 'file'){
             $stream = new VideoStream($location, get_video_mime_type($location));

@@ -30,6 +30,7 @@
             $authUrl = esc_url( '/githubauthvideo_auth/1?return_path=' . urlencode($this->RETURN_PATH) );
             $splashUrl = $this->get_splash_image();
             $ghIconUrl = esc_url( plugins_url( '../images/github-icon.png', __FILE__ ) );
+            $textContent = get_post_meta( $this->VIDEO_ID, 'githubauthvideo_video-unauthenticated-description', true );
             return <<<EOT
             <div class="githubvideoauth-video-auth-splash-container">
             <img src="$splashUrl" class="githubvideoauth-video-auth-splash-image" />
@@ -41,6 +42,9 @@
                     </a>
                 </div>
             </div>
+            <div class="githubvideoauth-video-text-content-container">
+                $textContent
+            </div>  
             EOT;
         }
 
@@ -49,6 +53,7 @@
             $ghIconUrl = esc_url( plugins_url( '../images/github-icon.png', __FILE__ ) );
             //TODO: Have reasonable default
             $sponsorUrl = esc_url('https://github.com/sponsors/' . $this->ORG_ID);
+            $textContent = get_post_meta( $this->VIDEO_ID, 'githubauthvideo_video-unauthenticated-description', true );
             return <<<EOT
             <div class="githubvideoauth-video-auth-splash-container">
             <img src="$splashUrl" class="githubvideoauth-video-auth-splash-image" />
@@ -64,12 +69,20 @@
                     </a>
                 </div>
             </div>
+            <div class="githubvideoauth-video-text-content-container">
+                $textContent
+            </div>  
             EOT;
         }
 
         public function get_video_html(){
             $videoUrl = '/githubauthvideo_video/' . $this->VIDEO_ID;
             $location = get_post_meta( $this->VIDEO_ID, 'githubauthvideo_video-location-uri', true );
+            $mediaId = intval($location);
+            if($mediaId){
+                //If using a media ID, get the file path
+                $location = get_attached_file($mediaId);
+            }
             $textContent = get_post_meta( $this->VIDEO_ID, 'githubauthvideo_video-description', true );
             $title = '';
             $post = get_post($this->VIDEO_ID);
@@ -84,7 +97,7 @@
                     title="$title"
                     alt="$this->VIDEO_ID"
                     controls
-                    preload="auto"
+                    preload="true"
                     >
                         <source src="$videoUrl" type="$mimeType"></source>
                     </video>
@@ -94,14 +107,14 @@
                 </div>
             EOT;
         }
-
+        //githubauthvideo_video-unauthenticated-description
         public function get_video_placeholder_html(){
             return <<<EOT
                 <div class="githubvideoauth-video-placeholder">
                     <div class="loader">Loading...</div>
                     <input type="hidden" class="videoId" value="$this->VIDEO_ID"/>
                     <input type="hidden" class="orgId" value="$this->ORG_ID"/>
-                </div>
+                </div>  
             EOT;
         }
     }

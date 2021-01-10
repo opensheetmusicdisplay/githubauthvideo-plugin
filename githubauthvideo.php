@@ -175,7 +175,7 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
 	}
 
 	$main_settings_options = get_option( 'githubauthvideo_main_settings' ); // Array of All Options
-	if($main_settings_options){
+	if($main_settings_options && array_key_exists("track_with_google_analytics_3", $main_settings_options)){
 		$track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; //Google Analytics setting
 		if($track_with_google_analytics_3 == TRUE){	
 			wp_enqueue_script(
