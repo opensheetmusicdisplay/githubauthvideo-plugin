@@ -4,9 +4,9 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 }
 /**
  * Plugin Name:     Github Authenticated Video
- * Description:     Video that is behind github oauth prompt. Checks for sponsorship
- * Version:         1.0.5
- * Author:          Justin Litten
+ * Description:     This plugin allows Wordpress users to put a video and description behind Github oauth prompt. It can optionally check for sponsorship of a given organization to allow access.
+ * Version:         1.1.0
+ * Author:          fredmeister77, ranacseruet, jeremyhixon
  * License:         GPL-2.0-or-later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:     githubauthvideo

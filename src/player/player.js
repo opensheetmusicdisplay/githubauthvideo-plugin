@@ -48,7 +48,8 @@ function renderPlaceholders(type, token, tokenType){
                                 currentPlaceholder.outerHTML = '<div>' + response.message + '</div>';
                                 currentReject(response.message);
                             } else { 
-                                if(response.data.data.organization.viewerIsSponsoring){
+                                if(response.data.data && response.data.data.organization &&
+                                   response.data.data.organization.viewerIsSponsoring){
                                     axios.post(githubauthvideo_player_js_data.video_html_url, {
                                         video_id: videoId,
                                         render_type: 'video'

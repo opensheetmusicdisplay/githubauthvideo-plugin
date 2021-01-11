@@ -2,7 +2,7 @@
 /**
  * Description of VideoStream
  *
- * @author Rana
+ * @author ranacseruet
  * @link http://codesamplez.com/programming/php-html5-video-streaming-tutorial
  */
 class VideoStream
