@@ -82,7 +82,7 @@
         /**
          * Returns string with message on error, otherwise returns boolean value indicating sponsor status of viewer
          */
-        public function is_viewer_sponsor_of_org(string $orgSlug){
+        public function is_viewer_sponsor_of_login(string $login){
             if($this->IGNORE_SPONSORSHIP){
                 return $this->is_token_valid();
             }
@@ -90,17 +90,28 @@
             //Likely need to use code to pagination through results and compare tier ID's.... Uhg
             $ql = <<<EOT
                 query {
-                        organization(login: "$orgSlug") {
-                        viewerIsSponsoring
-                        }            
+                        organization(login: "$login") {
+                            viewerIsSponsoring
+                        }
+                        user(login: "$login") {
+                            viewerIsSponsoring
+                        }
                 }
             EOT;
 
             $result = $this->execute_graphql($ql);
+            //if we don't find it, it will return with 'errors' not just error
             if($result['error']){
                 return $result['message'];
             } else {
-                return $result['data']['organization']['viewerIsSponsoring'];
+                if($result['data']){
+                    if ($result['organization'] != NULL){
+                        return $result['data']['organization']['viewerIsSponsoring'];
+                    } else if ($result['user'] != NULL){
+                        return $result['data']['user']['viewerIsSponsoring'];
+                    }
+                }
+                
             }
         }
     }

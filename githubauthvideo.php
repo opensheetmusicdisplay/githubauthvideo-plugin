@@ -114,7 +114,7 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 		}
 		$GithubApi = new GithubAPIService(GITHUB_GRAPH_API_URL);
 		if($GithubApi->is_token_valid()){
-			if($GithubApi->is_viewer_sponsor_of_org($orgId)){
+			if($GithubApi->is_viewer_sponsor_of_login($orgId)){
 				//Token seems to be valid, render actual video embed
 				return $renderer->get_video_html();
 			} else {

@@ -40,7 +40,7 @@
     //$tierId = get_post_meta( $videoId, 'githubauthvideo_github-sponsorship-tier-id', true );
 
     //use github api service methods, check here
-    $result = $GithubApi->is_viewer_sponsor_of_org($orgId);
+    $result = $GithubApi->is_viewer_sponsor_of_login($orgId);
     if(gettype($result) === 'string'){
         header('HTTP/1.0 500 Internal Server Error');
         echo 'Error checking Github API for Sponsor status. See message(s) below:<br>';

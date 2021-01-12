@@ -20,7 +20,7 @@ https://calebporzio.com/i-just-hit-dollar-100000yr-on-github-sponsors-heres-how-
 
 Specifically it is to help with "Phase 3: Sponsored Screencasts".
 
-This plugin utilizes Github OAuth and calls the Github API to gatekeep specified videos to only Github Users, with the option to require sponsorship to a particular organization (users coming very soon).
+This plugin utilizes Github OAuth and calls the Github API to gatekeep specified videos to only Github Users, with the option to require sponsorship to a particular organization or user.
 The plugin utilizes the built-in HTML5 video player, by embedding (when the user is authorized) a video and source element.
 
 The plugin adds an editor block to include in posts and a custom post type that specifies the necessary information for each video.
@@ -177,12 +177,10 @@ It is highly recommended to not use the 'http', URL hosted version of locally st
 This is because the video gatekeeping script will read and serve locally stored files directly, whereas for any URL hosted files it will read them as a web-client would, potentially using up your server bandwidth.
 If it's being hosted on a seperate CDN or server where that isn't an issue, then have at it.
 
-##### Github Organization Slug
-This is the organization 'login' from github to check against. This appears as the slug in the URL, e.g.: https://github.com/**opensheetmusicdisplay**/ 
+##### Github Organization or User Login
+This is the organization or user 'login' from github to check against. This appears as the slug in the URL, e.g.: https://github.com/**opensheetmusicdisplay**/ 
 
 This will also be the slug used when displaying the "Become a Sponsor Now" message to the user if they are not currently a sponsor but are authenticated with github, e.g.: https://github.com/sponsors/opensheetmusicdisplay
-
-Presently this only checks organizations, but we are fast working to check users as well. This was a small oversite (and may be corrected before publishing. So maybe you won't even be reading this text)
 
 ##### Github Sponsorship Tier ID
 This field is presently not used. The base functionality of checking whether a user is a sponsor or not is in place, but this is a planned feature to more granularly control which sponsor tiers can watch which videos.
@@ -221,7 +219,6 @@ NOTE: None of these are guaranteed. We will work on them as we can.
 - We utilize very minimal CSS styling on the video block, instead preferring to leave it up to the theme/site styling.
 
 ##### Possible Future Features
-- Only sponsored organizations are currently checked. We need to check on users as well. This is a very important feature - Actually hope to get this in before release. But if you are reading this text, it didn't happen. This one will be done very soon.
 - Specifying a sponsorship tier per-video. Asterisk (*) will indicate any tier. 
 - Size attribute for the video block. Currently we leave it up to CSS, but it might be nice to have the basic Wordpress size dropdown.
 - Nice-to-have: More tightly integrating Github API for the Organization (or User) slug field; It would be nice to be able to have some sort of typeahead or selection here.

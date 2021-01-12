@@ -39,7 +39,10 @@ function renderPlaceholders(type, token, tokenType){
                         const ql = 'query {' +
                             'organization(login: "' + orgId + '") {' +
                             'viewerIsSponsoring' +
-                            '}' +        
+                            '}' +    
+                            'user(login: "' + orgId + '") {' +
+                            'viewerIsSponsoring' +
+                            '}' +     
                           '}';
                         axios.post(githubauthvideo_player_js_data.github_api_url, JSON.stringify({query: ql}), 
                                       {headers: { 'Authorization': tokenType + ' ' + token }})
@@ -48,8 +51,16 @@ function renderPlaceholders(type, token, tokenType){
                                 currentPlaceholder.outerHTML = '<div>' + response.message + '</div>';
                                 currentReject(response.message);
                             } else { 
-                                if(response.data.data && response.data.data.organization &&
-                                   response.data.data.organization.viewerIsSponsoring){
+                                let isSponsoringOrg = false;
+                                let isSponsoringUser = false;
+                                if(response.data.data){
+                                    isSponsoringOrg = (response.data.data.organization &&
+                                        response.data.data.organization.viewerIsSponsoring);
+                                    isSponsoringUser = (response.data.data.user &&
+                                        response.data.data.user.viewerIsSponsoring);
+                                }
+
+                                if(isSponsoringOrg || isSponsoringUser){
                                     axios.post(githubauthvideo_player_js_data.video_html_url, {
                                         video_id: videoId,
                                         render_type: 'video'
