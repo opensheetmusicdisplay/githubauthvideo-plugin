@@ -37,7 +37,6 @@ function githubauthvideo_register_post_type() {
 		'menu_icon'           => 'dashicons-video-alt2',
 		'supports' => [
 			'title',
-			'revisions',
 			'custom_fields'
 		],
 		'rewrite' => true
