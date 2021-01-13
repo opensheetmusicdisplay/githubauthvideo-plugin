@@ -23,15 +23,10 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 
  //Improvements to make: Only check for auth once if multiple videos on page
 
- //TODO: these should be config options probably
-const GITHUB_GRAPH_API_URL = 'https://api.github.com/graphql';
-const GITHUB_OAUTH_BEGIN_URL = 'https://github.com/login/oauth/authorize';
-const GITHUB_OAUTH_TOKEN_URL = 'https://github.com/login/oauth/access_token';
+include_once 'includes.php';
 
-include 'api/VideoStream.php';
-include 'authentication/GithubAuthCookies.php';
-include 'api/GithubAPIService.php';
-include 'rendering/PlayerHtmlRendering.php';
+GithubAPIServiceFactory::registerGithubAPIService(new GithubAPIService(GITHUB_GRAPH_API_URL));
+PlayerHtmlRenderingFactory::registerPlayerHtmlRenderingService(new PlayerHtmlRenderer());
 
 //If we get more media utility functions like this, break out into it's own file.
 //For now, sufficient to contain it here
@@ -98,9 +93,9 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 	if(isset($block_attributes['videoId'])){
 		$videoId = $block_attributes['videoId'];
 	}
-	$orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-slug', true );
 	$returnPath = $_SERVER['REQUEST_URI'];
-	$renderer = new PlayerHtmlRenderer($videoId, $orgId, $returnPath);
+	$orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-slug', true );
+	$renderer = PlayerHtmlRenderingFactory::getPlayerHtmlRenderingServiceServiceInstance();
 
 	$main_settings_options = get_option( 'githubauthvideo_main_settings' );
 	$SERVER_SIDE_RENDERING = FALSE;
@@ -112,23 +107,27 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 		if($videoId == -1){
 			return '<div>No video was selected.</div>';
 		}
-		$GithubApi = new GithubAPIService(GITHUB_GRAPH_API_URL);
+		$GithubApi = GithubAPIServiceFactory::getGithubAPIServiceInstance();
 		if($GithubApi->is_token_valid()){
-			if($GithubApi->is_viewer_sponsor_of_login($orgId)){
+			$isUserSponsor = $GithubApi->is_viewer_sponsor_of_video($videoId);
+			if(gettype($isUserSponsor) === 'string'){
+				return '<div>' . $isUserSponsor . '</div>';
+			}
+			if($isUserSponsor){
 				//Token seems to be valid, render actual video embed
-				return $renderer->get_video_html();
+				return $renderer->get_video_html($videoId);
 			} else {
 				//User auth'd correctly, but is not sponsor of specified organization
-				return $renderer->get_sponsor_html();
+				return $renderer->get_sponsor_html($videoId, $orgId);
 			}
 		} else {
 			//User is not auth'd properly
-			return $renderer->get_auth_html();
+			return $renderer->get_auth_html($videoId, $returnPath);
 		}
 		
 	} else {
 		//If we aren't doing server-side rendering, render the placeholder for JS to take over 
-		return $renderer->get_video_placeholder_html();	
+		return $renderer->get_video_placeholder_html($videoId, $orgId);	
 	}
 }
 
@@ -157,7 +156,6 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
 			$IGNORE_SPONSORSHIP = $main_settings_options['ignore_sponsorship_4'];
 		}
 	
-		//TODO: Test if we need to pull in the HTML like this and compile w/ handlebars, or if the web service will be sufficient
 		wp_localize_script(
 			'githubauthvideo-script',
 			'githubauthvideo_player_js_data',
@@ -172,28 +170,6 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
 				'ignore_sponsorship' => $IGNORE_SPONSORSHIP
 			)
 		);
-	}
-
-	$main_settings_options = get_option( 'githubauthvideo_main_settings' ); // Array of All Options
-	if($main_settings_options && array_key_exists("track_with_google_analytics_3", $main_settings_options)){
-		$track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; //Google Analytics setting
-		if($track_with_google_analytics_3 == TRUE){	
-			wp_enqueue_script(
-				'githubauthvideo-analytics-script',
-				esc_url( plugins_url( 'build/player/analytics.min.js', __FILE__ ) ),
-				array(),
-				'1.0.1',
-				true
-			);
-
-			wp_localize_script(
-				'githubauthvideo-analytics-script',
-				'githubauthvideo_analytics_js_data',
-				array(
-					'server_side_rendering' => $SERVER_SIDE_RENDERING
-				)
-			);
-		}
 	}
 }
 
@@ -254,10 +230,21 @@ function githubauthvideo_uninstall(){
 
 register_uninstall_hook(__FILE__, 'githubauthvideo_uninstall');
 
-include 'admin-pages/settings.php';
-include 'admin-pages/post_type.php';
-add_action( 'init', 'phonicscore_githubauthvideo_block_init' );
-add_action( 'init',  'githubauthvideo_setup_rewrite_rules' );
-add_action( 'wp_enqueue_scripts', 'phonicscore_githubauthvideo_block_enqueue_js' );
-add_action('admin_enqueue_scripts', 'enqueue_editor_assets');
+function githubauthvideo_register_post_meta(){
+	new Github_Video_Entry_Fields;
+}
+function githubauthvideo_register_settings_page(){
+	if ( is_admin() )
+		$main_settings = new GithubVideoAuthMainSettings();
+}
+function activate_githubauthvideo_plugin(){
+	add_action ('init', 'githubauthvideo_register_post_meta');
+	add_action ('init', 'githubauthvideo_register_settings_page');
+	add_action( 'init', 'phonicscore_githubauthvideo_block_init' );
+	add_action( 'init',  'githubauthvideo_setup_rewrite_rules' );
+	add_action( 'wp_enqueue_scripts', 'phonicscore_githubauthvideo_block_enqueue_js' );
+	add_action('admin_enqueue_scripts', 'enqueue_editor_assets');
+}
+
+add_action('plugins_loaded', 'activate_githubauthvideo_plugin', 10);
 ?>

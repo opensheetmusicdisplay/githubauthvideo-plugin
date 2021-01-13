@@ -53,16 +53,16 @@
         $returnPath = $_GET['return_path'];
     }
 
-    $renderer = new PlayerHtmlRenderer($videoId, $orgId, $returnPath);
+    $renderer = PlayerHtmlRenderingFactory::getPlayerHtmlRenderingServiceServiceInstance();
     switch($renderType){
         case 'auth':
-            echo $renderer->get_auth_html();
+            echo $renderer->get_auth_html($videoId, $returnPath);
             break;
         case 'sponsor':
-            echo $renderer->get_sponsor_html();
+            echo $renderer->get_sponsor_html($videoId, $orgId);
             break;
         case 'video':
-            echo $renderer->get_video_html();
+            echo $renderer->get_video_html($videoId);
             break;
         default:
             header('HTTP/1.0 400 Bad Request');

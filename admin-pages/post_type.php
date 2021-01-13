@@ -70,12 +70,11 @@ function githubauthvideo_register_post_type() {
  * Retrieving the values:
  * Video Location URI = get_post_meta( get_the_ID(), 'githubauthvideo_video-location-uri', true )
  * Github Organization Slug = get_post_meta( get_the_ID(), 'githubauthvideo_github-organization-slug', true )
- * Github Sponsorship Tier ID (Not used yet) = get_post_meta( get_the_ID(), 'githubauthvideo_github-sponsorship-tier-id-not-used-yet', true )
  * Splash Screen = get_post_meta( get_the_ID(), 'githubauthvideo_splash-screen', true )
  * Video Description = get_post_meta( get_the_ID(), 'githubauthvideo_video-description', true )
  */
 class Github_Video_Entry_Fields {
-	private $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["github-sponsor-video"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"media","return": "id","label":"Media ID <em>or</em> Video Location URI","id":"githubauthvideo_video-location-uri"},{"type":"text","label":"Github Organization or User Login","id":"githubauthvideo_github-organization-slug"},{"type":"text","label":"Github Sponsorship Tier ID (Not used yet)","default":"*","id":"githubauthvideo_github-sponsorship-tier-id-not-used-yet"},{"type":"media","label":"Splash Screen","return":"url","id":"githubauthvideo_splash-screen"},{"type":"editor","label":"Unauthenticated Video Description","rows":"10","wpautop":"1","id":"githubauthvideo_video-unauthenticated-description"},{"type":"editor","label":"Authenticated Video Description","rows":"10","wpautop":"1","id":"githubauthvideo_video-description"}]}';
+	protected $config = '{"title":"Video Entry Data","description":"Specifies the necessary mapping to Github Sponsor Auth videos.","prefix":"githubauthvideo_","domain":"githubauthvideo","class_name":"Github_Video_Entry_Fields","post-type":["github-sponsor-video"],"context":"normal","priority":"default","cpt":"github-sponsor-video","fields":[{"type":"media","return": "id","label":"Media ID <em>or</em> Video Location URI","id":"githubauthvideo_video-location-uri"},{"type":"text","label":"Github Organization or User Login","id":"githubauthvideo_github-organization-slug"},{"type":"media","label":"Splash Screen","return":"url","id":"githubauthvideo_splash-screen"},{"type":"editor","label":"Unauthenticated Video Description","rows":"10","wpautop":"1","id":"githubauthvideo_video-unauthenticated-description"},{"type":"editor","label":"Authenticated Video Description","rows":"10","wpautop":"1","id":"githubauthvideo_video-description"}]}';
 
 	public function __construct() {
 		$this->config = json_decode( $this->config, true );
@@ -269,7 +268,6 @@ class Github_Video_Entry_Fields {
 	}
 
 }
-new Github_Video_Entry_Fields;
 
 //Register our video description field to be called by rest so it can be pulled down in the editor
 function rest_githubauthvideo_video_description_post_field( $post, $field_name, $request ) {
@@ -279,6 +277,15 @@ function rest_githubauthvideo_video_description_post_field( $post, $field_name, 
 function add_githubauthvideo_video_description_rest_field(){
 	register_rest_field( 'github-sponsor-video',
 		'githubauthvideo_video-description',
+		array(
+			'get_callback'  => 'rest_githubauthvideo_video_description_post_field',
+			'update_callback'   => null,
+			'schema'            => null,
+		)
+	);
+
+	register_rest_field( 'github-sponsor-video',
+		'githubauthvideo_video-unauthenticated-description',
 		array(
 			'get_callback'  => 'rest_githubauthvideo_video_description_post_field',
 			'update_callback'   => null,

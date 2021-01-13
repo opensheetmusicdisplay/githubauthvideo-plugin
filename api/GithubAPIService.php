@@ -48,7 +48,7 @@
                     $concatErr .= '<br>' . $result['errors'][$i]['message'];
                 }
                 $returnObject['error'] = TRUE;
-                $returnObject['message'] = 'Error calling Github API. Error(s) from Github: ' . $concatErr;
+                $returnObject['message'] = 'Gtihub API Error: ' . $concatErr;
                 $returnObject['data'] = NULL;
             } else {
                 //We have our data.
@@ -82,32 +82,43 @@
         /**
          * Returns string with message on error, otherwise returns boolean value indicating sponsor status of viewer
          */
-        public function is_viewer_sponsor_of_login(string $login){
+        public function is_viewer_sponsor_of_video(int $videoId){
             if($this->IGNORE_SPONSORSHIP){
                 return $this->is_token_valid();
             }
+
+            $login = get_post_meta( $videoId, 'githubauthvideo_github-organization-slug', true );
+            $errors = '';
             //TODO: Once sponsorship tiers exist in Github, need to update this to query properly
             //Likely need to use code to pagination through results and compare tier ID's.... Uhg
-            $ql = <<<EOT
+            $orgQl = <<<EOT
                 query {
                         organization(login: "$login") {
                             viewerIsSponsoring
                         }
-                        user(login: "$login") {
-                            viewerIsSponsoring
-                        }
                 }
             EOT;
-
-            $result = $this->execute_graphql($ql);
+            $result = $this->execute_graphql($orgQl);
+            
+            if($result['error']){
+                $errors .= $result['message'];
+                $userQl = <<<EOT
+                    query {
+                            user(login: "$login") {
+                                viewerIsSponsoring
+                            }
+                    }
+                EOT;
+                $result = $this->execute_graphql($userQl);
+            }
             //if we don't find it, it will return with 'errors' not just error
             if($result['error']){
-                return $result['message'];
+                return $errors . '<br>' . $result['message'];
             } else {
                 if($result['data']){
-                    if ($result['organization'] != NULL){
+                    if (array_key_exists('organization', $result['data'])){
                         return $result['data']['organization']['viewerIsSponsoring'];
-                    } else if ($result['user'] != NULL){
+                    } else if (array_key_exists('user', $result['data'])){
                         return $result['data']['user']['viewerIsSponsoring'];
                     }
                 }

@@ -2,8 +2,7 @@ const path = require('path');
 
 module.exports = {
   entry: {
-            player: './src/player/player.js',
-            analytics: './src/player/analytics.js'
+            player: './src/player/player.js'
         },
   output: {
     filename: '[name].min.js',

@@ -1,6 +1,4 @@
 <?php
-    //$json = file_get_contents('php://input');
-    //$request_data = json_decode($json, true);
     $Cookies = GithubAuthCookies::getCookiesInstance();
 
     $token = $Cookies->get_token();
@@ -15,14 +13,6 @@
 
     $videoId = get_query_var( 'githubauthvideo_video' );
 
-   /* if($request_data !== null && array_key_exists('video_id', $request_data) && isset($request_data['video_id'])){
-        $videoId = $request_data['video_id'];
-    } else if(array_key_exists('video_id', $_POST)){
-        $videoId = $_POST['video_id'];
-    } else if(array_key_exists('video_id', $_GET)){
-        $videoId = $_GET['video_id'];
-    }*/
-
     if(!isset($videoId)){
         header('HTTP/1.0 400 Bad Request');
         echo 'Video ID not provided.';
@@ -35,12 +25,10 @@
         exit;
     }
 
-    $GithubApi = new GithubAPIService(GITHUB_GRAPH_API_URL);
-    $orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-slug', true );
-    //$tierId = get_post_meta( $videoId, 'githubauthvideo_github-sponsorship-tier-id', true );
+    $GithubApi = GithubAPIServiceFactory::getGithubAPIServiceInstance();
 
     //use github api service methods, check here
-    $result = $GithubApi->is_viewer_sponsor_of_login($orgId);
+    $result = $GithubApi->is_viewer_sponsor_of_video($videoId);
     if(gettype($result) === 'string'){
         header('HTTP/1.0 500 Internal Server Error');
         echo 'Error checking Github API for Sponsor status. See message(s) below:<br>';

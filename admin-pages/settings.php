@@ -5,7 +5,7 @@
  */
 
 class GithubVideoAuthMainSettings {
-	private $main_settings_options;
+	protected $main_settings_options;
 
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'main_settings_add_plugin_page' ) );
@@ -30,14 +30,6 @@ class GithubVideoAuthMainSettings {
             'githubauthvideo_settings',
 			array( $this, 'main_settings_create_admin_page' )
 		);
-		/*
-		add_options_page(
-            'Github Sponsor Video',
-            'Github Sponsor Video Plugin',
-            'manage_options',
-            'githubauthvideo',
-			array( $this, 'main_settings_create_admin_page' ) // function
-		);*/
 	}
 
 	public function main_settings_create_admin_page() {
@@ -97,14 +89,6 @@ class GithubVideoAuthMainSettings {
 		);
 
 		add_settings_field(
-			'track_with_google_analytics_3', // id
-			'Track With Google Analytics', // title
-			array( $this, 'track_with_google_analytics_3_callback' ), // callback
-			'main-settings-admin', // page
-			'main_settings_setting_section' // section
-		);
-
-		add_settings_field(
 			'ignore_sponsorship_4', // id
 			'Ignore Sponsorship Status', // title
 			array( $this, 'ignore_sponsorship_4_callback' ), // callback
@@ -141,10 +125,6 @@ class GithubVideoAuthMainSettings {
 
 		if ( isset( $input['jwt_private_key_2'] ) ) {
 			$sanitary_values['jwt_private_key_2'] = sanitize_text_field( $input['jwt_private_key_2'] );
-		}
-
-		if ( isset( $input['track_with_google_analytics_3'] ) ) {
-			$sanitary_values['track_with_google_analytics_3'] = $input['track_with_google_analytics_3'];
 		}
 
 		if ( isset( $input['ignore_sponsorship_4'] ) ) {
@@ -186,13 +166,6 @@ class GithubVideoAuthMainSettings {
 		);
 	}
 
-	public function track_with_google_analytics_3_callback() {
-		printf(
-			'<input type="checkbox" name="githubauthvideo_main_settings[track_with_google_analytics_3]" id="track_with_google_analytics_3" value="track_with_google_analytics_3" %s> <label for="track_with_google_analytics_3">If GA is added to the front-end, the player can automatically track playback events to it.</label><br><sub>NOTE: You may need to clear the server-side cache when toggling this setting.</sub>',
-			( isset( $this->main_settings_options['track_with_google_analytics_3'] ) && $this->main_settings_options['track_with_google_analytics_3'] === 'track_with_google_analytics_3' ) ? 'checked' : ''
-		);
-	}
-
 	public function ignore_sponsorship_4_callback() {
 		printf(
 			'<input type="checkbox" name="githubauthvideo_main_settings[ignore_sponsorship_4]" id="ignore_sponsorship_4" value="ignore_sponsorship_4" %s> <label for="ignore_sponsorship_4">Check to ignore whether the user is a sponsor of the specified organization. Just Github authentication will grant them access.</label><br><sub>NOTE: You may need to clear the server-side cache when toggling this setting.</sub>',
@@ -215,8 +188,6 @@ class GithubVideoAuthMainSettings {
 	}
 
 }
-if ( is_admin() )
-	$main_settings = new GithubVideoAuthMainSettings();
 
 /* 
  * Retrieve this value with:
@@ -224,7 +195,6 @@ if ( is_admin() )
  * $github_app_client_id_0 = $main_settings_options['github_app_client_id_0']; // Github App Client ID
  * $github_app_client_secret_1 = $main_settings_options['github_app_client_secret_1']; // Github App Client Secret
  * $jwt_private_key_2 = $main_settings_options['jwt_private_key_2']; // Private Key For Session Generation
- * $track_with_google_analytics_3 = $main_settings_options['track_with_google_analytics_3']; // Whether we want to enable google analytics or not (needs included already)
  * $ignore_sponsorship_4 = $main_settings_options['ignore_sponsorship_4']; // Whether to track if the user is sponsoring the organization or not for video access
  * $do_not_enforce_https_5 = $main_settings_options['do_not_enforce_https_5']; // Check to ignore enforcement of HTTPS on the server
  * $server_side_rendering_6 = $main_settings_options['server_side_rendering_6']; // Whether the server does the rendering or the client
