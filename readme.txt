@@ -1,6 +1,6 @@
 === Github Authenticated Video ===
-Contributors:      fredmeister77, ranacseruet, jeremyhixon
-Donate link:       https://OSMD.org/SponsorOSMD
+Contributors:      opensheetmusicdisplay, fredmeister77, ranacseruet, jeremyhixon
+Donate link:       https://OSMD.org/Donate
 Tags:              block,github,video,sponsor,oauth
 Requires at least: 5.5.0
 Tested up to:      5.5.1
@@ -31,8 +31,14 @@ There is also an option to track user video interactions with Google Analytics (
 - The "FAQ" is empty currently. This will grow as we get actual questions from the community upon release.
 - The "Creating an Authenticated Video" section covers adding a video that is behind Github authentication.
 - The "Screenshots" section shows the admin section pages as well default examples of the video and auth screens.
-- The "Limitations/Planned Features" section contains info on some features that are desirable and their relative priority, as well as current limitations of the plugin.
+- The "Limitations/Future Features" section contains info on some features that are desirable and their relative priority, as well as current limitations of the plugin.
 
+=== About Us ===
+We have developed the open-source [Opensheetmusicdisplay](https://opensheetmusicdisplay.org/): A library for rendering MusicXML in the browser using Vexflow.
+We developed this plugin to help us more easily create sponsor-specific screencasts. 
+We are making it available here free to give back to the sponsorware community and pay it forward.
+We hope you find this plugin useful, and if so, please consider sponsoring us or donating at our link above.
+Thank you!
 
 == Installation ==
 
