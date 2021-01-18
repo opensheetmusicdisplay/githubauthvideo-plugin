@@ -1,6 +1,6 @@
 === Github Authenticated Video ===
 Contributors:      fredmeister77, ranacseruet, jeremyhixon
-Donate link:       https://opensheetmusicdisplay.org/#custom_html-4
+Donate link:       https://OSMD.org/SponsorOSMD
 Tags:              block,github,video,sponsor,oauth
 Requires at least: 5.5.0
 Tested up to:      5.5.1
@@ -91,26 +91,6 @@ This is an extra layer of security to ensure that no other application is attemp
 #### Optional Settings
 
 The remaining settings are optional.
-##### Track with Google Analytics
-    This option will trigger the plugin to send Google Anayltics events tracking user interaction with your videos.
-    
-    A couple of notes:
-    - Google Analytics must be included on your Wordpress site in another way; When this setting is enabled the plugin will search for an existing Analytics reference and use that for sending events.
-    - This supports both `ga` and `gtag` analytics libraries.
-
-    The events that are sent include (event name in parens):
-    - Play Start (start)
-    - Pause Playback (pause)
-    - Playback Completed (complete)
-    - Volume Change (volume-change)
-    - Video Seek (seek)
-
-*Event Structure*
-- The GA event name above is set as the 'action'. 
-- The event category is always 'video'
-- The event label is '\<video id\>': '\<video title\>' Based on the Wordpress fields.
-- The event value is playback timestamp in seconds for every event EXCEPT volume change, where it is the volume level from 0-100.
-
 ##### Ignore Sponsorship status
 
 When this is enabled the script will merely check if the user is authenticated with Github to allow them to access videos, and will not check sponsorship status.
@@ -182,9 +162,6 @@ This is the organization or user 'login' from github to check against. This appe
 
 This will also be the slug used when displaying the "Become a Sponsor Now" message to the user if they are not currently a sponsor but are authenticated with github, e.g.: https://github.com/sponsors/opensheetmusicdisplay
 
-##### Github Sponsorship Tier ID
-This field is presently not used. The base functionality of checking whether a user is a sponsor or not is in place, but this is a planned feature to more granularly control which sponsor tiers can watch which videos.
-
 ##### Splash Screen
 This is another media field which can accept a URI (file or http/s) or a Wordpress media item can be selected.
 This is the image that is rendered as the background for the placeholder/dummy video when the user is not authenticated (or is not a sponsor) and it is also set as the 'poster' for the video.
@@ -214,11 +191,10 @@ This section is to briefly address known limitations and features that are eithe
 NOTE: None of these are guaranteed. We will work on them as we can.
 
 ##### Limitations
-- We do not yet support specifying a sponsorship tier to authenticate with for a video. The field is present and this is planned.
 - We do not specify any JS library to render the video, so older browsers that don't support HTML5 will not work out of the box. At the present, you can use a library like [videojs](https://videojs.com/) to render on the video element. So this seems best left as a choice for plugin users.
 - We utilize very minimal CSS styling on the video block, instead preferring to leave it up to the theme/site styling.
 
-##### Possible Future Features
+##### Possible Future or Premium Features
 - Specifying a sponsorship tier per-video. Asterisk (*) will indicate any tier. 
 - Size attribute for the video block. Currently we leave it up to CSS, but it might be nice to have the basic Wordpress size dropdown.
 - Nice-to-have: More tightly integrating Github API for the Organization (or User) slug field; It would be nice to be able to have some sort of typeahead or selection here.
