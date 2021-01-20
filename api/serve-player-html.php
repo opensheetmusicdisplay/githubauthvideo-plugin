@@ -14,7 +14,9 @@
         $videoId = $_GET['video_id'];
     }
 
-    if(!isset($videoId)){
+    $videoId = intval($videoId);
+
+    if(!isset($videoId) || !is_numeric($videoId) || $videoId < 1){
         header('HTTP/1.0 400 Bad Request');
         echo '<div>Video ID not provided.</div>';
         exit;
@@ -36,7 +38,8 @@
         $renderType = $_GET['render_type'];
     }
 
-    if(!isset($renderType)){
+    if(!isset($renderType) || !is_string($renderType) || ($renderType != 'auth'
+        && $renderType != 'sponsor' && $renderType != 'video')){
         header('HTTP/1.0 400 Bad Request');
         echo '<div>Render type not provided.</div>';
         exit;
@@ -53,7 +56,9 @@
         $returnPath = $_GET['return_path'];
     }
 
-    $renderer = PlayerHtmlRenderingFactory::getPlayerHtmlRenderingServiceServiceInstance();
+    $returnPath = esc_url_raw($returnPath);
+
+    $renderer = PhonicScore_GithubAuthVideo_PlayerHtmlRenderingFactory::getPlayerHtmlRenderingServiceServiceInstance();
     switch($renderType){
         case 'auth':
             echo $renderer->get_auth_html($videoId, $returnPath);

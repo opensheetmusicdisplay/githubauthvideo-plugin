@@ -1,5 +1,5 @@
 <?php
-    class GithubAPIService {
+    class PhonicScore_GithubAuthVideo_GithubAPIService {
         private static $githubUsernameRegex = '(/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i)';
         protected $TOKEN;
         protected $TOKEN_TYPE;
@@ -7,7 +7,7 @@
         protected $IGNORE_SPONSORSHIP = FALSE;
 
         public function __construct(string $graphApiUrl){
-            $Cookies = GithubAuthCookies::getCookiesInstance();
+            $Cookies = PhonicScore_GithubAuthVideo_GithubAuthCookies::getCookiesInstance();
             $this->TOKEN = $Cookies->get_token();
             $this->TOKEN_TYPE = $Cookies->get_token_type();
             $this->GRAPH_API_URL = $graphApiUrl;

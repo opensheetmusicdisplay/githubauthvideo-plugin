@@ -1,5 +1,5 @@
 <?php
-    class GithubAuthCookies {
+    class PhonicScore_GithubAuthVideo_GithubAuthCookies {
         private $domain;
         private $token_key;
         private $token_type_key;
@@ -30,14 +30,14 @@
                 }
             }
 
-            GithubAuthCookies::$singleton = $this;
+            PhonicScore_GithubAuthVideo_GithubAuthCookies::$singleton = $this;
         }
 
         public static function getCookiesInstance(){
-            if(isset(GithubAuthCookies::$singleton)){
-                return GithubAuthCookies::$singleton;
+            if(isset(PhonicScore_GithubAuthVideo_GithubAuthCookies::$singleton)){
+                return PhonicScore_GithubAuthVideo_GithubAuthCookies::$singleton;
             } else {
-                return new GithubAuthCookies;
+                return new PhonicScore_GithubAuthVideo_GithubAuthCookies;
             }
         }
 

@@ -1,4 +1,4 @@
-=== Github Authenticated Video ===
+=== Authenticate Sponsorware Videos via GitHub ===
 Contributors:      opensheetmusicdisplay, fredmeister77, ranacseruet, jeremyhixon
 Donate link:       https://OSMD.org/Donate
 Tags:              block,github,video,sponsor,oauth
@@ -9,7 +9,7 @@ Requires PHP:      7.0.0
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin allows Wordpress users to put a video and description behind Github oauth prompt. It can optionally check for sponsorship of a given organization to allow access.
+This plugin allows Wordpress users to put a video and description behind Github oauth prompt. It can optionally check for sponsorship of a given organization or user to allow access.
 
 == Description ==
 
@@ -33,7 +33,7 @@ There is also an option to track user video interactions with Google Analytics (
 - The "Screenshots" section shows the admin section pages as well default examples of the video and auth screens.
 - The "Limitations/Future Features" section contains info on some features that are desirable and their relative priority, as well as current limitations of the plugin.
 
-=== About Us ===
+#### About Us
 We have developed the open-source [Opensheetmusicdisplay](https://opensheetmusicdisplay.org/): A library for rendering MusicXML in the browser using Vexflow.
 We developed this plugin to help us more easily create sponsor-specific screencasts. 
 We are making it available here free to give back to the sponsorware community and pay it forward.
@@ -116,7 +116,10 @@ If your host does not do this, you can toggle this setting to render server-side
 
 == Frequently Asked Questions ==
 
-TBD
+= Where can I get information or support for this plugin? =
+
+Please reach out to us at: support@opensheetmusicdisplay.org if you have any issues or questions about the plugin.
+
 
 == Screenshots ==
 

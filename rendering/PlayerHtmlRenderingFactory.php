@@ -1,17 +1,17 @@
 <?php 
-    class PlayerHtmlRenderingFactory {
+    class PhonicScore_GithubAuthVideo_PlayerHtmlRenderingFactory {
         private static $singleton = NULL;
 
         private function __construct(){
         }
 
         public static function getPlayerHtmlRenderingServiceServiceInstance(){
-            return PlayerHtmlRenderingFactory::$singleton;
+            return PhonicScore_GithubAuthVideo_PlayerHtmlRenderingFactory::$singleton;
         }
 
-        public static function registerPlayerHtmlRenderingService(PlayerHtmlRenderer $service){
+        public static function registerPlayerHtmlRenderingService(PhonicScore_GithubAuthVideo_PlayerHtmlRenderer $service){
             if(isset($service)){
-                PlayerHtmlRenderingFactory::$singleton = $service;   
+                PhonicScore_GithubAuthVideo_PlayerHtmlRenderingFactory::$singleton = $service;   
             }
         }
     }

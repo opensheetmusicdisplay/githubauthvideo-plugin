@@ -1,5 +1,5 @@
 <?php
-    $Cookies = GithubAuthCookies::getCookiesInstance();
+    $Cookies = PhonicScore_GithubAuthVideo_GithubAuthCookies::getCookiesInstance();
 
     $token = $Cookies->get_token();
 
@@ -13,7 +13,7 @@
 
     $videoId = get_query_var( 'githubauthvideo_video' );
 
-    if(!isset($videoId)){
+    if(!isset($videoId) || !is_numeric($videoId) || $videoId < 1){
         header('HTTP/1.0 400 Bad Request');
         echo 'Video ID not provided.';
         exit;
@@ -25,7 +25,7 @@
         exit;
     }
 
-    $GithubApi = GithubAPIServiceFactory::getGithubAPIServiceInstance();
+    $GithubApi = PhonicScore_GithubAuthVideo_GithubAPIServiceFactory::getGithubAPIServiceInstance();
 
     //use github api service methods, check here
     $result = $GithubApi->is_viewer_sponsor_of_video($videoId);
@@ -51,7 +51,7 @@
         }        
         //if it's a local file, do proper streaming
         if($scheme == 'file'){
-            $stream = new VideoStream($location, get_video_mime_type($location));
+            $stream = new PhonicScore_GithubAuthVideo_VideoStream($location, phonicscore_githubauthvideo_get_video_mime_type($location));
             $stream->start();
         } else { //otherwise pass through from the URL
             //TODO: Maybe stream better. Detect stream headers, forward, etc.

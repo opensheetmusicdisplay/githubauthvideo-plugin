@@ -43,7 +43,7 @@
         new Sha256(),
         InMemory::base64Encoded($JWT_PRIVATE_KEY)
     );
-    $Cookies = GithubAuthCookies::getCookiesInstance();
+    $Cookies = PhonicScore_GithubAuthVideo_GithubAuthCookies::getCookiesInstance();
     $step = get_query_var( 'githubauthvideo_auth', 1);
     $githubAuthCode = get_query_var('code', NULL);
     //No Code present. Means we are just beginning the auth flow.

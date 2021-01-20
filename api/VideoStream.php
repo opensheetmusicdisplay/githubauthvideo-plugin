@@ -1,11 +1,11 @@
 <?php
 /**
- * Description of VideoStream
+ * Description of PhonicScore_GithubAuthVideo_VideoStream
  *
  * @author ranacseruet
  * @link http://codesamplez.com/programming/php-html5-video-streaming-tutorial
  */
-class VideoStream
+class PhonicScore_GithubAuthVideo_VideoStream
 {
     private $path = '';
     private $mimeType;

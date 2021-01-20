@@ -1,5 +1,5 @@
 <?php
-    class PlayerHtmlRenderer {
+    class PhonicScore_GithubAuthVideo_PlayerHtmlRenderer {
         public function __construct(){
         }
 
@@ -82,7 +82,7 @@
             if($post){
                 $title = $post->post_title;
             }
-            $mimeType = get_video_mime_type($location);
+            $mimeType = phonicscore_githubauthvideo_get_video_mime_type($location);
             return <<<EOT
                 <h5 class="githubvideoauth-video-title-container">$title</h5>
                 <div class="githubvideoauth-video-container">

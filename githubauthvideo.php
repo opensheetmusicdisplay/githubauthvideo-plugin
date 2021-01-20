@@ -3,10 +3,10 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 	require __DIR__ . '/vendor/autoload.php';
 }
 /**
- * Plugin Name:     Github Authenticated Video
- * Description:     This plugin allows Wordpress users to put a video and description behind Github oauth prompt. It can optionally check for sponsorship of a given organization to allow access.
+ * Plugin Name:     Authenticate Sponsorware Videos via GitHub
+ * Description:     This plugin allows Wordpress users to put a video and description behind Github oauth prompt. It can optionally check for sponsorship of a given organization or user to allow access.
  * Version:         1.1.0
- * Author:          fredmeister77, ranacseruet, jeremyhixon
+ * Author:          opensheetmusicdisplay, fredmeister77, ranacseruet, jeremyhixon
  * License:         GPL-2.0-or-later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:     githubauthvideo
@@ -25,12 +25,12 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 
 include_once 'includes.php';
 
-GithubAPIServiceFactory::registerGithubAPIService(new GithubAPIService(GITHUB_GRAPH_API_URL));
-PlayerHtmlRenderingFactory::registerPlayerHtmlRenderingService(new PlayerHtmlRenderer());
+PhonicScore_GithubAuthVideo_GithubAPIServiceFactory::registerGithubAPIService(new PhonicScore_GithubAuthVideo_GithubAPIService(GITHUB_GRAPH_API_URL));
+PhonicScore_GithubAuthVideo_PlayerHtmlRenderingFactory::registerPlayerHtmlRenderingService(new PhonicScore_GithubAuthVideo_PlayerHtmlRenderer());
 
 //If we get more media utility functions like this, break out into it's own file.
 //For now, sufficient to contain it here
-function get_video_mime_type($location){
+function phonicscore_githubauthvideo_get_video_mime_type($location){
 	$mimes = new \Mimey\MimeTypes;
 	$mimeType = 'video/*';
 	//try path info
@@ -95,7 +95,7 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 	}
 	$returnPath = $_SERVER['REQUEST_URI'];
 	$orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-slug', true );
-	$renderer = PlayerHtmlRenderingFactory::getPlayerHtmlRenderingServiceServiceInstance();
+	$renderer = PhonicScore_GithubAuthVideo_PlayerHtmlRenderingFactory::getPlayerHtmlRenderingServiceServiceInstance();
 
 	$main_settings_options = get_option( 'githubauthvideo_main_settings' );
 	$SERVER_SIDE_RENDERING = FALSE;
@@ -107,7 +107,7 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 		if($videoId == -1){
 			return '<div>No video was selected.</div>';
 		}
-		$GithubApi = GithubAPIServiceFactory::getGithubAPIServiceInstance();
+		$GithubApi = PhonicScore_GithubAuthVideo_GithubAPIServiceFactory::getGithubAPIServiceInstance();
 		if($GithubApi->is_token_valid()){
 			$isUserSponsor = $GithubApi->is_viewer_sponsor_of_video($videoId);
 			if(gettype($isUserSponsor) === 'string'){
@@ -150,7 +150,7 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
 			true
 		);
 
-		$Cookies = GithubAuthCookies::getCookiesInstance();
+		$Cookies = PhonicScore_GithubAuthVideo_GithubAuthCookies::getCookiesInstance();
 		$IGNORE_SPONSORSHIP = FALSE;
 		if($main_settings_options && array_key_exists("ignore_sponsorship_4", $main_settings_options)){
 			$IGNORE_SPONSORSHIP = $main_settings_options['ignore_sponsorship_4'];
@@ -173,7 +173,7 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
 	}
 }
 
-function enqueue_editor_assets(){
+function phonicscore_githubauthvideo_enqueue_editor_assets(){
 	wp_localize_script(
 		'phonicscore-githubauthvideo-block-editor',
 		'js_data',
@@ -243,7 +243,7 @@ function activate_githubauthvideo_plugin(){
 	add_action( 'init', 'phonicscore_githubauthvideo_block_init' );
 	add_action( 'init',  'githubauthvideo_setup_rewrite_rules' );
 	add_action( 'wp_enqueue_scripts', 'phonicscore_githubauthvideo_block_enqueue_js' );
-	add_action('admin_enqueue_scripts', 'enqueue_editor_assets');
+	add_action('admin_enqueue_scripts', 'phonicscore_githubauthvideo_enqueue_editor_assets');
 }
 
 add_action('plugins_loaded', 'activate_githubauthvideo_plugin', 10);
