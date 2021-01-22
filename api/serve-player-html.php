@@ -73,7 +73,7 @@
             $returnPath = sanitize_text_field($_GET['return_path']);
         }
 
-        if(!is_page($returnPath)){
+        if($returnPath == NULL | $returnPath == ''){
             $returnPath = '/';
         }
 

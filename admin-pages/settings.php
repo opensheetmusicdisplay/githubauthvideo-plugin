@@ -159,14 +159,14 @@ class githubauthvideo_MainSettings {
 
 	public function github_app_client_secret_1_callback() {
 		printf(
-			'<input class="regular-text" minlength="40" maxlength="40" pattern="[a-fA-F0-9]+" required type="text" name="githubauthvideo_main_settings[github_app_client_secret_1]" id="github_app_client_secret_1" value="%s">',
+			'<input class="regular-text" minlength="40" maxlength="40" pattern="[a-fA-F0-9]+" required type="password" name="githubauthvideo_main_settings[github_app_client_secret_1]" id="github_app_client_secret_1" value="%s"><span style="cursor:pointer;font-size:30px;" class="dashicons dashicons-visibility" onclick="window.githubauthvideo_showPassword(\'github_app_client_secret_1\')"></span>',
 			isset( $this->main_settings_options['github_app_client_secret_1'] ) ? esc_attr( $this->main_settings_options['github_app_client_secret_1']) : ''
 		);
 	}
 
 	public function jwt_private_key_2_callback() {
 		printf(
-			'<input class="regular-text" minlength="32" type="text" required name="githubauthvideo_main_settings[jwt_private_key_2]" id="jwt_private_key_2" value="%s">',
+			'<input class="regular-text" minlength="32" type="password" required name="githubauthvideo_main_settings[jwt_private_key_2]" id="jwt_private_key_2" value="%s"><span style="cursor:pointer;font-size:30px;" class="dashicons dashicons-visibility" onclick="window.githubauthvideo_showPassword(\'jwt_private_key_2\')"></span>',
 			isset( $this->main_settings_options['jwt_private_key_2'] ) ? esc_attr( $this->main_settings_options['jwt_private_key_2']) : ''
 		);
 	}

@@ -9,7 +9,7 @@ import axios from 'axios';
  * @param {string} token Our token issued by github
  * @param {string} tokenType The token type for use in the auth header. Default of bearer
  */
-function renderPlaceholders(type, token, tokenType){
+function githubauthvideo_renderPlaceholders(type, token, tokenType){
     const returnPath = window.location.pathname + window.location.search + window.location.hash;
     const placeholders = document.getElementsByClassName('githubvideoauth-video-placeholder');
     let promiseList = [];
@@ -146,15 +146,15 @@ function renderPlaceholders(type, token, tokenType){
         //check if token is valid and not expired
         axios.post(githubauthvideo_player_js_data.github_api_url, {}, {headers: { 'Authorization': tokenType + ' ' + token }})
         .then(function(response){
-            renderPlaceholders('video', token, tokenType);
+            githubauthvideo_renderPlaceholders('video', token, tokenType);
         }, 
         function(errorResponse){
             //Token is invalid. Remove, render auth
             Cookies.remove(githubauthvideo_player_js_data.token_key);
             Cookies.remove(githubauthvideo_player_js_data.token_type_key);
-            renderPlaceholders('auth', token, tokenType);
+            githubauthvideo_renderPlaceholders('auth', token, tokenType);
         });
    } else { //Render auth instead
-    renderPlaceholders('auth');
+    githubauthvideo_renderPlaceholders('auth');
    }
 })();

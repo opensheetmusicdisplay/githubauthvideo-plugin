@@ -54,10 +54,8 @@
         if($step == 1 || !isset($githubAuthCode)){
             //Void out auth cookies
             $Cookies->void_auth_cookies();
-            $returnPath = sanitize_text_field(get_query_var('return_path', '/'));
-            if(is_page($returnPath)){
-                $returnPath = urldecode($returnPath);
-            } else {
+            $returnPath = urldecode(sanitize_text_field(get_query_var('return_path', '/')));
+            if($returnPath == NULL || $returnPath == ''){
                 $returnPath = '/';
             }
             //generate state with JWT
@@ -144,9 +142,6 @@
                 exit;
             } else if(array_key_exists('access_token', $result)){
                 $returnPathFromToken = sanitize_text_field($stateToken->claims()->get('return_path', '/')); // Retrieves the return path
-                if(!is_page($returnPathFromToken)){
-                    $returnPathFromToken = '/';
-                }
                 $Cookies->set_auth_cookies($result['access_token'], $result['token_type']);
                 header('Location: ' . $returnPathFromToken);
                 die();
