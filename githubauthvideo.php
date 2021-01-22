@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 	require __DIR__ . '/vendor/autoload.php';
 }
@@ -11,7 +13,6 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:     githubauthvideo
  *
- * @package         phonicscore
  */
 
 /**
@@ -25,12 +26,12 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 
 include_once 'includes.php';
 
-PhonicScore_GithubAuthVideo_GithubAPIServiceFactory::registerGithubAPIService(new PhonicScore_GithubAuthVideo_GithubAPIService(GITHUB_GRAPH_API_URL));
-PhonicScore_GithubAuthVideo_PlayerHtmlRenderingFactory::registerPlayerHtmlRenderingService(new PhonicScore_GithubAuthVideo_PlayerHtmlRenderer());
+githubauthvideo_GithubAPIServiceFactory::registerGithubAPIService(new githubauthvideo_GithubAPIService(GITHUB_GRAPH_API_URL));
+githubauthvideo_PlayerHtmlRenderingFactory::registerPlayerHtmlRenderingService(new githubauthvideo_PlayerHtmlRenderer());
 
 //If we get more media utility functions like this, break out into it's own file.
 //For now, sufficient to contain it here
-function phonicscore_githubauthvideo_get_video_mime_type($location){
+function githubauthvideo_get_video_mime_type($location){
 	$mimes = new \Mimey\MimeTypes;
 	$mimeType = 'video/*';
 	//try path info
@@ -41,7 +42,7 @@ function phonicscore_githubauthvideo_get_video_mime_type($location){
 	return $mimeType;
 }
 
-function phonicscore_githubauthvideo_block_init() {
+function githubauthvideo_block_init() {
 	$dir = dirname( __FILE__ );
 
 	$script_asset_path = "$dir/build/index.asset.php";
@@ -80,12 +81,12 @@ function phonicscore_githubauthvideo_block_init() {
 		'editor_script' => 'phonicscore-githubauthvideo-block-editor',
 		'editor_style'  => 'phonicscore-githubauthvideo-block-editor',
 		'style'         => 'phonicscore-githubauthvideo-block',
-		'render_callback' => 'phonicscore_githubauthvideo_block_render_callback'
+		'render_callback' => 'githubauthvideo_block_render_callback'
 	) );
 }
 
 //Determines what's rendered in WP.
-function phonicscore_githubauthvideo_block_render_callback($block_attributes, $content) {
+function githubauthvideo_block_render_callback($block_attributes, $content) {
 	if(is_admin()){
 		return '';
 	}
@@ -95,7 +96,7 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 	}
 	$returnPath = $_SERVER['REQUEST_URI'];
 	$orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-slug', true );
-	$renderer = PhonicScore_GithubAuthVideo_PlayerHtmlRenderingFactory::getPlayerHtmlRenderingServiceServiceInstance();
+	$renderer = githubauthvideo_PlayerHtmlRenderingFactory::getPlayerHtmlRenderingServiceServiceInstance();
 
 	$main_settings_options = get_option( 'githubauthvideo_main_settings' );
 	$SERVER_SIDE_RENDERING = FALSE;
@@ -107,7 +108,7 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 		if($videoId == -1){
 			return '<div>No video was selected.</div>';
 		}
-		$GithubApi = PhonicScore_GithubAuthVideo_GithubAPIServiceFactory::getGithubAPIServiceInstance();
+		$GithubApi = githubauthvideo_GithubAPIServiceFactory::getGithubAPIServiceInstance();
 		if($GithubApi->is_token_valid()){
 			$isUserSponsor = $GithubApi->is_viewer_sponsor_of_video($videoId);
 			if(gettype($isUserSponsor) === 'string'){
@@ -131,7 +132,7 @@ function phonicscore_githubauthvideo_block_render_callback($block_attributes, $c
 	}
 }
 
-function phonicscore_githubauthvideo_block_enqueue_js( ) {
+function githubauthvideo_block_enqueue_js( ) {
 	$main_settings_options = get_option( 'githubauthvideo_main_settings' );
 
 	$SERVER_SIDE_RENDERING = FALSE;
@@ -150,7 +151,7 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
 			true
 		);
 
-		$Cookies = PhonicScore_GithubAuthVideo_GithubAuthCookies::getCookiesInstance();
+		$Cookies = githubauthvideo_GithubAuthCookies::getCookiesInstance();
 		$IGNORE_SPONSORSHIP = FALSE;
 		if($main_settings_options && array_key_exists("ignore_sponsorship_4", $main_settings_options)){
 			$IGNORE_SPONSORSHIP = $main_settings_options['ignore_sponsorship_4'];
@@ -160,9 +161,6 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
 			'githubauthvideo-script',
 			'githubauthvideo_player_js_data',
 			array(
-				'auth_html' => plugins_url( 'html/auth.html', __FILE__ ),
-				'sponsor_html' => plugins_url( 'html/sponsor.html', __FILE__ ),
-				'video_html' => plugins_url( 'html/video.html', __FILE__ ),
 				'token_key' => $Cookies->get_token_key(),
 				'token_type_key' => $Cookies->get_token_type_key(),
 				'github_api_url' => GITHUB_GRAPH_API_URL,
@@ -173,7 +171,7 @@ function phonicscore_githubauthvideo_block_enqueue_js( ) {
 	}
 }
 
-function phonicscore_githubauthvideo_enqueue_editor_assets(){
+function githubauthvideo_enqueue_editor_assets(){
 	wp_localize_script(
 		'phonicscore-githubauthvideo-block-editor',
 		'js_data',
@@ -185,10 +183,10 @@ function phonicscore_githubauthvideo_enqueue_editor_assets(){
 
 function githubauthvideo_setup_rewrite_rules(){
 	add_rewrite_rule( 'githubauthvideo_video_html[/]?$', 'index.php?githubauthvideo_video_html=1', 'top' );
-	add_rewrite_rule( 'githubauthvideo_video/([0-9]+)[/]?$', 'index.php?githubauthvideo_video=$matches[1]', 'top' );
+	add_rewrite_rule( 'githubauthvideo_video/([0-9]+)[/]*\?nonce=(\S{10})$', 'index.php?githubauthvideo_video=$matches[1]&nonce=$matches[2]', 'top' );
 	add_rewrite_rule( 'githubauthvideo_auth/([1-2])[/]?(.*)$', 'index.php?githubauthvideo_auth=$matches[1]', 'top' );
 	add_filter( 'query_vars', function( $query_vars ) {
-		array_push($query_vars, 'githubauthvideo_video', 'githubauthvideo_auth', 'githubauthvideo_video_html', 'code', 'state', 'return_path');
+		array_push($query_vars, 'githubauthvideo_video', 'githubauthvideo_auth', 'githubauthvideo_video_html', 'code', 'state', 'return_path', 'nonce');
 		return $query_vars;
 	} );
 
@@ -231,20 +229,20 @@ function githubauthvideo_uninstall(){
 register_uninstall_hook(__FILE__, 'githubauthvideo_uninstall');
 
 function githubauthvideo_register_post_meta(){
-	new Github_Video_Entry_Fields;
+	new githubauthvideo_VideoEntryFields;
 }
 function githubauthvideo_register_settings_page(){
 	if ( is_admin() )
-		$main_settings = new GithubVideoAuthMainSettings();
+		$main_settings = new githubauthvideo_MainSettings();
 }
-function activate_githubauthvideo_plugin(){
+function githubauthvideo_activate_plugin(){
 	add_action ('init', 'githubauthvideo_register_post_meta');
 	add_action ('init', 'githubauthvideo_register_settings_page');
-	add_action( 'init', 'phonicscore_githubauthvideo_block_init' );
+	add_action( 'init', 'githubauthvideo_block_init' );
 	add_action( 'init',  'githubauthvideo_setup_rewrite_rules' );
-	add_action( 'wp_enqueue_scripts', 'phonicscore_githubauthvideo_block_enqueue_js' );
-	add_action('admin_enqueue_scripts', 'phonicscore_githubauthvideo_enqueue_editor_assets');
+	add_action( 'wp_enqueue_scripts', 'githubauthvideo_block_enqueue_js' );
+	add_action('admin_enqueue_scripts', 'githubauthvideo_enqueue_editor_assets');
 }
 
-add_action('plugins_loaded', 'activate_githubauthvideo_plugin', 10);
+add_action('plugins_loaded', 'githubauthvideo_activate_plugin', 10);
 ?>

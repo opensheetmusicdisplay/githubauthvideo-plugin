@@ -1,5 +1,8 @@
 <?php
-    class PhonicScore_GithubAuthVideo_PlayerHtmlRenderer {
+    if ( ! defined( 'ABSPATH' ) ) exit;
+    
+    class githubauthvideo_PlayerHtmlRenderer {
+
         public function __construct(){
         }
 
@@ -69,7 +72,8 @@
         }
 
         public function get_video_html(int $videoId = -1){
-            $videoUrl = '/githubauthvideo_video/' . $videoId;
+            $nonce = wp_create_nonce('githubauthvideo_serve_video_' . $videoId);
+            $videoUrl = '/githubauthvideo_video/' . $videoId . '?nonce=' . $nonce;
             $location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
             $mediaId = intval($location);
             if($mediaId){
@@ -82,7 +86,7 @@
             if($post){
                 $title = $post->post_title;
             }
-            $mimeType = phonicscore_githubauthvideo_get_video_mime_type($location);
+            $mimeType = githubauthvideo_get_video_mime_type($location);
             return <<<EOT
                 <h5 class="githubvideoauth-video-title-container">$title</h5>
                 <div class="githubvideoauth-video-container">
@@ -102,11 +106,13 @@
         }
         //githubauthvideo_video-unauthenticated-description
         public function get_video_placeholder_html(int $videoId = -1, string $orgId = ''){
+            $nonce = wp_create_nonce('githubauthvideo_render_html_' . $videoId);
             return <<<EOT
                 <div class="githubvideoauth-video-placeholder">
                     <div class="loader">Loading...</div>
                     <input type="hidden" class="videoId" value="$videoId"/>
                     <input type="hidden" class="orgId" value="$orgId"/>
+                    <input type="hidden" class="nonce" value="$nonce"/>
                 </div>  
             EOT;
         }

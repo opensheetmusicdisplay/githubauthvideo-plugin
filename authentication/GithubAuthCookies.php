@@ -1,5 +1,7 @@
 <?php
-    class PhonicScore_GithubAuthVideo_GithubAuthCookies {
+    if ( ! defined( 'ABSPATH' ) ) exit;
+    
+    class githubauthvideo_GithubAuthCookies {
         private $domain;
         private $token_key;
         private $token_type_key;
@@ -30,14 +32,14 @@
                 }
             }
 
-            PhonicScore_GithubAuthVideo_GithubAuthCookies::$singleton = $this;
+            githubauthvideo_GithubAuthCookies::$singleton = $this;
         }
 
         public static function getCookiesInstance(){
-            if(isset(PhonicScore_GithubAuthVideo_GithubAuthCookies::$singleton)){
-                return PhonicScore_GithubAuthVideo_GithubAuthCookies::$singleton;
+            if(isset(githubauthvideo_GithubAuthCookies::$singleton)){
+                return githubauthvideo_GithubAuthCookies::$singleton;
             } else {
-                return new PhonicScore_GithubAuthVideo_GithubAuthCookies;
+                return new githubauthvideo_GithubAuthCookies;
             }
         }
 

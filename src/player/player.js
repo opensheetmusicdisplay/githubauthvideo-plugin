@@ -2,10 +2,12 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 /**
  * 
- * @param {*} type string value representing what should be rendered for our videos:
+ * @param {string} type string value representing what should be rendered for our videos:
  *              -video is the actual video
  *              -auth is the authentication splash screen
  *              -sponsor is the sponsor splash screen
+ * @param {string} token Our token issued by github
+ * @param {string} tokenType The token type for use in the auth header. Default of bearer
  */
 function renderPlaceholders(type, token, tokenType){
     const returnPath = window.location.pathname + window.location.search + window.location.hash;
@@ -25,10 +27,17 @@ function renderPlaceholders(type, token, tokenType){
                 };
                 const currentPromise = new Promise(currentExecutor);
                 promiseList.push(currentPromise);
-                //Check for org sponsorship on this video
-                if(type === 'video' && !githubauthvideo_player_js_data.ignore_sponsorship){
+                const nonceInput = currentPlaceholder.getElementsByClassName('nonce')[0];
+                let nonce = '';
+                if(nonceInput){
+                    nonce = nonceInput.getAttribute('value');
+                }
+                if(!nonce || nonce.length === 0){
+                    currentPlaceholder.outerHTML = '<div>Error rendering: No nonce specified.</div>';
+                } else if(type === 'video' && !githubauthvideo_player_js_data.ignore_sponsorship){
+                    //Check for org or user sponsorship on this video
                     const orgInput = currentPlaceholder.getElementsByClassName('orgId')[0];
-                    let orgId = "";
+                    let orgId = '';
                     if(orgInput){
                         orgId = orgInput.getAttribute('value');
                     }
@@ -59,11 +68,11 @@ function renderPlaceholders(type, token, tokenType){
                                     isSponsoringUser = (response.data.data.user &&
                                         response.data.data.user.viewerIsSponsoring);
                                 }
-
                                 if(isSponsoringOrg || isSponsoringUser){
                                     axios.post(githubauthvideo_player_js_data.video_html_url, {
                                         video_id: videoId,
-                                        render_type: 'video'
+                                        render_type: 'video',
+                                        nonce: nonce
                                     }).then(function(response){
                                         currentPlaceholder.outerHTML = response.data;
                                         currentResolve();
@@ -74,7 +83,8 @@ function renderPlaceholders(type, token, tokenType){
                                 } else {
                                     axios.post(githubauthvideo_player_js_data.video_html_url, {
                                         video_id: videoId,
-                                        render_type: 'sponsor'
+                                        render_type: 'sponsor',
+                                        nonce: nonce
                                     }).then(function(response){
                                         currentPlaceholder.outerHTML = response.data;
                                         currentResolve();
@@ -95,7 +105,8 @@ function renderPlaceholders(type, token, tokenType){
                     axios.post(githubauthvideo_player_js_data.video_html_url, {
                         video_id: videoId,
                         render_type: type,
-                        return_path: returnPath
+                        return_path: returnPath,
+                        nonce: nonce
                     }).then(function(response){
                         currentPlaceholder.outerHTML = response.data;
                         currentResolve();

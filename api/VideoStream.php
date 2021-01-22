@@ -1,11 +1,12 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
 /**
- * Description of PhonicScore_GithubAuthVideo_VideoStream
+ * Description of githubauthvideo_VideoStream
  *
  * @author ranacseruet
  * @link http://codesamplez.com/programming/php-html5-video-streaming-tutorial
  */
-class PhonicScore_GithubAuthVideo_VideoStream
+class githubauthvideo_VideoStream
 {
     private $path = '';
     private $mimeType;

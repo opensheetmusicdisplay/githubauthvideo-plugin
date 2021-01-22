@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit;
 
  //TODO: these should be config options probably
  const GITHUB_GRAPH_API_URL = 'https://api.github.com/graphql';

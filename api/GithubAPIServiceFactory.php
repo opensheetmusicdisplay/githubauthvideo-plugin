@@ -1,17 +1,19 @@
 <?php
-    class PhonicScore_GithubAuthVideo_GithubAPIServiceFactory {
+    if ( ! defined( 'ABSPATH' ) ) exit;
+
+    class githubauthvideo_GithubAPIServiceFactory {
         private static $singleton = NULL;
 
         private function __construct(){
         }
 
         public static function getGithubAPIServiceInstance(){
-            return PhonicScore_GithubAuthVideo_GithubAPIServiceFactory::$singleton;
+            return githubauthvideo_GithubAPIServiceFactory::$singleton;
         }
 
-        public static function registerGithubAPIService(PhonicScore_GithubAuthVideo_GithubAPIService $service){
+        public static function registerGithubAPIService(githubauthvideo_GithubAPIService $service){
             if(isset($service)){
-                PhonicScore_GithubAuthVideo_GithubAPIServiceFactory::$singleton = $service;   
+                githubauthvideo_GithubAPIServiceFactory::$singleton = $service;   
             }
         }
     }

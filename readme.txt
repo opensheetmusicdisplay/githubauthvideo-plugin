@@ -25,8 +25,6 @@ The plugin utilizes the built-in HTML5 video player, by embedding (when the user
 
 The plugin adds an editor block to include in posts and a custom post type that specifies the necessary information for each video.
 
-There is also an option to track user video interactions with Google Analytics (more details under "Installation" page)
-
 - The "Installation" section has information on setting up the plugin properly, as well as plugin-wide settings.
 - The "FAQ" is empty currently. This will grow as we get actual questions from the community upon release.
 - The "Creating an Authenticated Video" section covers adding a video that is behind Github authentication.
@@ -45,7 +43,7 @@ Thank you!
 1. Install the plugin via the Wordpress Plugin installer. 
     1. In the Wordpress admin sidebar, navigate to Plugins -> Add New.
     2. *Wordpress Automatic Installation*
-        1. Search for its listing near the top of this page: "Github Authenticated Video".
+        1. Search for its listing near the top of this page: "Authenticate Sponsorware Videos via GitHub".
         2. Review the plugin information, reviews, details, etc.
         3. Click "Install Now" and Wordpress will automatically install it.
     2. **or** *Manual Upload*
@@ -54,7 +52,7 @@ Thank you!
         3. Click "Install Now"
 2. Activate the Plugin
     1. In the Wordpress admin sidebar, navigate to Plugins -> Installed Plugins
-    2. Locate the "Github Authenticated Video" plugin in this list
+    2. Locate the "Authenticate Sponsorware Videos via GitHub" plugin in this list
     3. Select "Activate" beneath it
 3. Specify the requisite settings
     1. A new entry will have appeared at the bottom of your admin sidebar: "Github Video" (you may need to refresh the page)
