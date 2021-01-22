@@ -164,7 +164,7 @@ function githubauthvideo_block_enqueue_js( ) {
 				'token_key' => $Cookies->get_token_key(),
 				'token_type_key' => $Cookies->get_token_type_key(),
 				'github_api_url' => GITHUB_GRAPH_API_URL,
-				'video_html_url' => '/githubauthvideo_video_html',
+				'video_html_url' => '/?githubauthvideo_video_html=1',
 				'ignore_sponsorship' => $IGNORE_SPONSORSHIP
 			)
 		);
@@ -192,16 +192,23 @@ function githubauthvideo_enqueue_admin_assets($hook){
 }
 
 function githubauthvideo_setup_rewrite_rules(){
-	add_rewrite_rule( 'githubauthvideo_video_html[/]?$', 'index.php?githubauthvideo_video_html=1', 'top' );
-	add_rewrite_rule( 'githubauthvideo_video/([0-9]+)[/]*\?nonce=(\S{10})$', 'index.php?githubauthvideo_video=$matches[1]&nonce=$matches[2]', 'top' );
-	add_rewrite_rule( 'githubauthvideo_auth/([1-2])[/]?(.*)$', 'index.php?githubauthvideo_auth=$matches[1]', 'top' );
+	$structure = get_option( 'permalink_structure' );
+	//These do not work with the default permalink type.
+	//Just using query params seems to work for all cases.
+	//add_rewrite_rule( 'githubauthvideo_video_html[/]?$', 'index.php?githubauthvideo_video_html=1', 'top' );
+	//add_rewrite_rule( 'githubauthvideo_video/([0-9]+)/(\S{10})$', 'index.php?githubauthvideo_video=$matches[1]&nonce=$matches[2]', 'top' );
+	//add_rewrite_rule( 'githubauthvideo_auth/([1-2])[/]?(.*)$', 'index.php?githubauthvideo_auth=$matches[1]', 'top' );
 	add_filter( 'query_vars', function( $query_vars ) {
 		array_push($query_vars, 'githubauthvideo_video', 'githubauthvideo_auth', 'githubauthvideo_video_html', 'code', 'state', 'return_path', 'nonce');
 		return $query_vars;
 	} );
 
 	add_action( 'template_include', function( $template ) {
-		if ( get_query_var( 'githubauthvideo_video' ) != false && get_query_var( 'githubauthvideo_video' ) != '' ) {
+		$path = parse_url($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], PHP_URL_PATH);
+		//Don't allow overriding any other path with these query params other than root
+		if($path !== '/'){
+			return $template;
+		} else if ( get_query_var( 'githubauthvideo_video' ) != false && get_query_var( 'githubauthvideo_video' ) != '' ) {
 			return plugin_dir_path( __FILE__ ) . 'authentication/serve-video.php';
 		} else if ( get_query_var( 'githubauthvideo_auth' ) != false && get_query_var( 'githubauthvideo_auth' ) != '' ) {
 			return plugin_dir_path( __FILE__ ) . 'authentication/auth.php';
@@ -212,9 +219,9 @@ function githubauthvideo_setup_rewrite_rules(){
 	} );
 }
 
-function githubauthvideo_activate() { 
+function githubauthvideo_activate() {
     // Register rewrite rules
-    githubauthvideo_setup_rewrite_rules(); 
+	githubauthvideo_setup_rewrite_rules();
     // reset permalinks
     flush_rewrite_rules(); 
 }

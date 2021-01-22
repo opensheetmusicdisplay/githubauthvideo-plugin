@@ -23,7 +23,7 @@
                 $returnPath = '/';
             }
 
-            $authUrl = esc_url( '/githubauthvideo_auth/1?return_path=' . urlencode($returnPath) );
+            $authUrl = esc_url( '/?githubauthvideo_auth=1&return_path=' . urlencode($returnPath) );
             $splashUrl = $this->get_splash_image($videoId);
             $ghIconUrl = esc_url( plugins_url( '../images/github-icon.png', __FILE__ ) );
             $textContent = get_post_meta( $videoId, 'githubauthvideo_video-unauthenticated-description', true );
@@ -73,7 +73,7 @@
 
         public function get_video_html(int $videoId = -1){
             $nonce = wp_create_nonce('githubauthvideo_serve_video_' . $videoId);
-            $videoUrl = '/githubauthvideo_video/' . $videoId . '?nonce=' . $nonce;
+            $videoUrl = '/?githubauthvideo_video=' . $videoId . '&nonce=' . $nonce;
             $location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
             $mediaId = intval($location);
             if($mediaId){

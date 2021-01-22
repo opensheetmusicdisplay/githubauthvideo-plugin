@@ -40,7 +40,7 @@
             $requestScheme = $_SERVER['REQUEST_SCHEME'];
         }
         
-        $REDIRECT_URI = $requestScheme . '://' . $_SERVER['HTTP_HOST'] . '/githubauthvideo_auth/2';
+        $REDIRECT_URI = $requestScheme . '://' . $_SERVER['HTTP_HOST'] . '/?githubauthvideo_auth=2';
     
         //setup JWT configuration used for generating 
         $configuration = Configuration::forSymmetricSigner(
