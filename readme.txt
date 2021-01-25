@@ -71,9 +71,9 @@ The homepage URL will be the root URL of your Wordpress site where the videos wi
 This is what you would enter in the Homepage URL field. (**NOTE: It is recommended to include the scheme, either http or https, of your server)
 
 ***IMPORTANT: READ OR PLUGIN WILL NOT WORK***
-The Authorization callback URL *must* be a specific structure for the plugin to work correctly. You must append the path: `/githubauthvideo_auth/2`
+The Authorization callback URL *must* be a specific structure for the plugin to work correctly. You must append the query param: `?githubauthvideo_auth=2`
 to your root url. So using our above example, the Authorization Callback URL should be:
-`https://www.wordpress-example-url.com/githubauthvideo_auth/2`.
+`https://www.wordpress-example-url.com?githubauthvideo_auth=2`.
 
 After you register the application, you can get the Client ID from the applications settings page, and also generate the Client Secret. (You should be taken to this page after register, but it can also be navigated to here: https://github.com/settings/developers) 
 
