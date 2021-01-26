@@ -53,7 +53,7 @@ class githubauthvideo_VideoStream
             $c_start = $this->start;
             $c_end = $this->end;
  
-            list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
+            list(, $range) = explode('=', sanitize_text_field($_SERVER['HTTP_RANGE']), 2);
             if (strpos($range, ',') !== false) {
                 header('HTTP/1.1 416 Requested Range Not Satisfiable');
                 header("Content-Range: bytes $this->start-$this->end/$this->size");

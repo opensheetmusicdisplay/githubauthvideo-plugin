@@ -117,19 +117,40 @@ class githubauthvideo_MainSettings {
 	public function main_settings_sanitize($input) {
 		$sanitary_values = array();
 		if ( isset( $input['github_app_client_id_0'] ) ) {
-			if (ctype_xdigit($input['github_app_client_id_0']) ){
-				$sanitary_values['github_app_client_id_0'] = sanitize_text_field( $input['github_app_client_id_0'] );
+			$client_id = sanitize_text_field( $input['github_app_client_id_0'] );
+			if (strlen($client_id) === 20 && ctype_xdigit($client_id) ){
+				$sanitary_values['github_app_client_id_0'] = $client_id;
+			} else {
+				if(isset( $this->main_settings_options['github_app_client_id_0'] )){
+					$sanitary_values['github_app_client_id_0'] = $this->main_settings_options['github_app_client_id_0'];
+				}
+				add_settings_error('github_app_client_id_0', 'github_app_client_id_0_len_hex', 'The Github app client ID must be a 20 digit hexadecimal number.');
 			}
 		}
 
 		if ( isset( $input['github_app_client_secret_1'] ) ) {
-			if (ctype_xdigit($input['github_app_client_secret_1']) ){
-				$sanitary_values['github_app_client_secret_1'] = sanitize_text_field( $input['github_app_client_secret_1'] );
+			$client_secret = sanitize_text_field( $input['github_app_client_secret_1'] );
+			if (strlen($client_secret) === 40 && ctype_xdigit($client_secret) ){
+				$sanitary_values['github_app_client_secret_1'] = $client_secret;
+			} else {
+				if(isset( $this->main_settings_options['github_app_client_secret_1'] )){
+					$sanitary_values['github_app_client_secret_1'] = $this->main_settings_options['github_app_client_secret_1'];
+				}
+				add_settings_error('github_app_client_secret_1', 'github_app_client_secret_1_len_hex', 'The Github app client secret must be a 40 digit hexadecimal number.');
 			}
 		}
 
 		if ( isset( $input['jwt_private_key_2'] ) ) {
-			$sanitary_values['jwt_private_key_2'] = sanitize_text_field( $input['jwt_private_key_2'] );
+			$jwt_private_key =  sanitize_text_field( $input['jwt_private_key_2'] );
+			if(base64_decode($jwt_private_key, true)){
+				$sanitary_values['jwt_private_key_2'] = $jwt_private_key;
+			} else {
+				if(isset( $this->main_settings_options['jwt_private_key_2'] )){
+					$sanitary_values['jwt_private_key_2'] = $this->main_settings_options['jwt_private_key_2'];
+				}
+				add_settings_error('jwt_private_key_2', 'jwt_private_key_2_base', 'The Private key for session generation must be a base64 string.');
+			}
+			
 		}
 
 		if ( isset( $input['ignore_sponsorship_4'] ) ) {
@@ -166,7 +187,7 @@ class githubauthvideo_MainSettings {
 
 	public function jwt_private_key_2_callback() {
 		printf(
-			'<input class="regular-text" minlength="32" type="password" required name="githubauthvideo_main_settings[jwt_private_key_2]" id="jwt_private_key_2" value="%s"><span style="cursor:pointer;font-size:30px;" class="dashicons dashicons-visibility" onclick="window.githubauthvideo_showPassword(\'jwt_private_key_2\')"></span>',
+			'<input class="regular-text" minlength="32" pattern="^[-A-Za-z0-9+\/]*={0,3}$" type="password" required name="githubauthvideo_main_settings[jwt_private_key_2]" id="jwt_private_key_2" value="%s"><span style="cursor:pointer;font-size:30px;" class="dashicons dashicons-visibility" onclick="window.githubauthvideo_showPassword(\'jwt_private_key_2\')"></span><br><sub>NOTE: Must be a base64 string</sub>',
 			isset( $this->main_settings_options['jwt_private_key_2'] ) ? esc_attr( $this->main_settings_options['jwt_private_key_2']) : ''
 		);
 	}

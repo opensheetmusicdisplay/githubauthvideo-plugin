@@ -3,7 +3,7 @@ Contributors:      opensheetmusicdisplay, fredmeister77, ranacseruet, jeremyhixo
 Donate link:       https://OSMD.org/Donate
 Tags:              block,github,video,sponsor,oauth
 Requires at least: 5.5.0
-Tested up to:      5.5.1
+Tested up to:      5.6.0
 Stable tag:        1.1.0
 Requires PHP:      7.0.0
 License:           GPL-2.0-or-later
@@ -84,8 +84,8 @@ After you register the application, you can get the Client ID from the applicati
 
 #### Private Key for Session Generation
 
-Generate a random string for the Private Key For Session Generation field. This can be any string, but should be long and random.
-    > Use your favorite password generator, or this one works great: https://passwordsgenerator.net/. We recommend at least 32 characters.
+Generate a random Base64 key for the Private Key For Session Generation field. This must be a base64 string, and should be long and random.
+    > Use your favorite generator, or this one works (note: it is recommended to use in offline mode): https://generate.plus/en/base64. We require at least 32 characters.
 
 This is used to cryptographically sign information (in a [JWT](https://jwt.io)) from the Wordpress server during Github Authentication.
 This is an extra layer of security to ensure that no other application is attempting to forge access requests to the Wordpress server.

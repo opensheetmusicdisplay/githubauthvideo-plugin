@@ -27,20 +27,12 @@
             echo 'Github video authentication has not been configured properly. If you are the admin, please register your Github App and set a private key.';
             exit;
         }
-        if($DO_NOT_ENFORCE_HTTPS == FALSE && $_SERVER['REQUEST_SCHEME'] != 'https'){
+        if($DO_NOT_ENFORCE_HTTPS == FALSE && SERVER_SCHEME != 'https'){
             echo 'Server must have SSL enabled for Github video Authentication.';
             exit;
         }
-    
-        $requestScheme = 'https';
-        if($DO_NOT_ENFORCE_HTTPS == TRUE){
-            $requestScheme = 'http';
-        }
-        if(isset($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] != ''){
-            $requestScheme = $_SERVER['REQUEST_SCHEME'];
-        }
         
-        $REDIRECT_URI = $requestScheme . '://' . $_SERVER['HTTP_HOST'] . '/?githubauthvideo_auth=2';
+        $REDIRECT_URI = SERVER_SCHEME . '://' . SERVER_HOST . '/?githubauthvideo_auth=2';
     
         //setup JWT configuration used for generating 
         $configuration = Configuration::forSymmetricSigner(
@@ -62,9 +54,9 @@
             $now   = new DateTimeImmutable();
             $token = $configuration->builder()
                             // Configures the issuer (iss claim)
-                            ->issuedBy($_SERVER['HTTP_HOST'])
+                            ->issuedBy(SERVER_HOST)
                             // Configures the audience (aud claim)
-                            ->permittedFor($_SERVER['HTTP_HOST'])
+                            ->permittedFor(SERVER_HOST)
                             // Configures the time that the token was issue (iat claim)
                             ->issuedAt($now)
                             // Configures the time that the token can be used (nbf claim)
@@ -74,9 +66,9 @@
                             //Return path claim
                             ->withClaim('return_path', $returnPath)
                             //user agent claim
-                            ->withClaim('user_agent', $_SERVER['HTTP_USER_AGENT'])
+                            ->withClaim('user_agent', sanitize_text_field($_SERVER['HTTP_USER_AGENT']))
                             //IP claim
-                            ->withClaim('ip', $_SERVER['REMOTE_ADDR'])
+                            ->withClaim('ip', sanitize_text_field($_SERVER['REMOTE_ADDR']))
                             // Builds a new token
                             ->getToken($configuration->signer(), $configuration->signingKey());
     
@@ -105,7 +97,7 @@
                 exit;
             }
         
-            if (! $configuration->validator()->validate($stateToken, new IssuedBy($_SERVER['HTTP_HOST']))) {
+            if (! $configuration->validator()->validate($stateToken, new IssuedBy(SERVER_HOST))) {
                 echo 'State was not issued by this server. Authentication failed.';
                 exit;
             }
@@ -115,7 +107,7 @@
             $stateTokenAgentClaim = $stateToken->claims()->get('user_agent', '');
             $stateTokenIpClaim = $stateToken->claims()->get('ip', '');
         
-            if ($stateTokenAgentClaim != $_SERVER['HTTP_USER_AGENT'] || $stateTokenIpClaim != $_SERVER['REMOTE_ADDR']) {
+            if ($stateTokenAgentClaim != sanitize_text_field($_SERVER['HTTP_USER_AGENT']) || $stateTokenIpClaim != sanitize_text_field($_SERVER['REMOTE_ADDR'])) {
                 echo 'User agent or IP address do not match state token claim. Authentication failed.';
                 exit;
             }
@@ -141,10 +133,20 @@
                 echo 'Error authenticating with Github. Error from github: ' . $result['error_description'];
                 exit;
             } else if(array_key_exists('access_token', $result)){
-                $returnPathFromToken = sanitize_text_field($stateToken->claims()->get('return_path', '/')); // Retrieves the return path
-                $Cookies->set_auth_cookies($result['access_token'], $result['token_type']);
-                header('Location: ' . $returnPathFromToken);
-                die();
+                $access_token = sanitize_text_field($result['access_token']);
+                if($Cookies->is_token_valid($access_token)){
+                    $token_type = 'bearer';
+                    if(array_key_exists('token_type', $result)){
+                        $token_type = sanitize_text_field($result['token_type']);
+                    }
+                    $returnPathFromToken = sanitize_text_field($stateToken->claims()->get('return_path', '/')); // Retrieves the return path
+                    $Cookies->set_auth_cookies($access_token, $token_type);
+                    header('Location: ' . $returnPathFromToken);
+                    die();
+                } else {
+                    echo 'Access Token Invalid.';
+                    exit;
+                }
             } else {
                 echo 'Unknown error authenticating with Github. Enable error logging in auth.php if you are the admin.';
                 //error logging... This is probably the easiest way to get the full info. Not wise to provide to end users though.

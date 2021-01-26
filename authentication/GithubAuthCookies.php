@@ -10,10 +10,10 @@
         private static $singleton = NULL;
 
         private function __construct(){
-            $this->domain = str_replace( '.', '', $_SERVER['HTTP_HOST'] );
+            $this->domain = str_replace( '.', '', SERVER_HOST );
             $this->token_key = 'githubauthvideo_' . $this->domain . '_token';
             $this->token_type_key = 'githubauthvideo_' . $this->domain . '_token_type';
-            $this->cookie_domain = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
+            $this->cookie_domain = SERVER_SCHEME . '://' . SERVER_HOST;
             $main_settings_options = get_option( 'githubauthvideo_main_settings' ); // Array of All Options
             $this->secure_cookie = TRUE;
             $do_not_enforce_https = FALSE;
@@ -21,15 +21,9 @@
                 $do_not_enforce_https = $main_settings_options['do_not_enforce_https_5'];
             }
 
-            if($do_not_enforce_https){
-                $requestScheme = 'http';
-                if(isset($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] != ''){
-                    $requestScheme = $_SERVER['REQUEST_SCHEME'];
-                }
+            if($do_not_enforce_https && SERVER_SCHEME != 'https'){
                 //Only have an insecure cookie if we aren't enforcing https AND the request scheme is not https
-                if($requestScheme != 'https'){
-                    $this->secure_cookie = FALSE;
-                }
+                $this->secure_cookie = FALSE;
             }
 
             githubauthvideo_GithubAuthCookies::$singleton = $this;
@@ -40,6 +34,14 @@
                 return githubauthvideo_GithubAuthCookies::$singleton;
             } else {
                 return new githubauthvideo_GithubAuthCookies;
+            }
+        }
+
+        public function is_token_valid($token){
+            if(isset($token) && strlen($token) === 40 && ctype_xdigit($token)){
+                return true;
+            } else {
+                return false;
             }
         }
 
@@ -59,15 +61,18 @@
 
         public function get_token(){
             if (array_key_exists($this->token_key, $_COOKIE)){
-                return $_COOKIE[$this->token_key];
-            } else {
-                return NULL;
+                $tokenCookieValue = sanitize_text_field($_COOKIE[$this->token_key]);
+                if($this->is_token_valid($tokenCookieValue)){
+                    return $tokenCookieValue;
+                }
             }
+
+            return NULL;
         }
 
         public function get_token_type(){
             if (array_key_exists($this->token_type_key, $_COOKIE)){
-                return $_COOKIE[$this->token_type_key];
+                return sanitize_text_field($_COOKIE[$this->token_type_key]);
             } else {
                 return 'bearer';
             }

@@ -94,7 +94,7 @@ function githubauthvideo_block_render_callback($block_attributes, $content) {
 	if(isset($block_attributes['videoId'])){
 		$videoId = $block_attributes['videoId'];
 	}
-	$returnPath = $_SERVER['REQUEST_URI'];
+	$returnPath = SERVER_REQUEST_URI;
 	$orgId = get_post_meta( $videoId, 'githubauthvideo_github-organization-slug', true );
 	$renderer = githubauthvideo_PlayerHtmlRenderingFactory::getPlayerHtmlRenderingServiceServiceInstance();
 
@@ -204,7 +204,7 @@ function githubauthvideo_setup_rewrite_rules(){
 	} );
 
 	add_action( 'template_include', function( $template ) {
-		$url = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+		$url = SERVER_SCHEME . '://' . SERVER_HOST . SERVER_REQUEST_URI;
 		$path = parse_url($url, PHP_URL_PATH);
 		//Don't allow overriding any other path with these query params other than root
 		if($path !== '/'){

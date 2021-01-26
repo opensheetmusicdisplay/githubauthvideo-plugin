@@ -5,6 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  const GITHUB_GRAPH_API_URL = 'https://api.github.com/graphql';
  const GITHUB_OAUTH_BEGIN_URL = 'https://github.com/login/oauth/authorize';
  const GITHUB_OAUTH_TOKEN_URL = 'https://github.com/login/oauth/access_token';
+ define('SERVER_SCHEME', (isset($_SERVER['HTTPS']) ? "https" : "http"));
+ define('SERVER_HOST', sanitize_text_field($_SERVER['HTTP_HOST']));
+ define('SERVER_REQUEST_URI', sanitize_text_field($_SERVER['REQUEST_URI']));
 
 include_once 'api/VideoStream.php';
 include_once 'authentication/GithubAuthCookies.php';
