@@ -2,7 +2,7 @@
 	"name": "phonicscore/githubauthvideo",
 	"title": "Github Authenticated Video",
 	"category": "media",
-	"icon": "smiley",
+	"icon": "video-alt2",
 	"description": "Video that is behind github oauth prompt. Checks for sponsorship",
 	"textdomain": "githubauthvideo",
 	"supports": {
