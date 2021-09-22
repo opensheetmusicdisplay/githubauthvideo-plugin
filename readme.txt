@@ -137,6 +137,10 @@ Please reach out to us at: support@opensheetmusicdisplay.org if you have any iss
 
 == Changelog ==
 
+= 1.1.1 =
+* Fix issue with Github token changes.
+We no longer try to sanity check github tokens since they can (and did) change in structure.
+
 = 1.1.0 =
 * Initial Release
 
