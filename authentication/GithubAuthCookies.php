@@ -38,7 +38,8 @@
         }
 
         public function is_token_valid($token){
-            if(isset($token) && strlen($token) === 40 && ctype_xdigit($token)){
+            //Removed verification for token since Github can (and does) change the token scheme
+            if(isset($token)){
                 return true;
             } else {
                 return false;
