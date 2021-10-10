@@ -72,15 +72,25 @@
         }
 
         public function get_video_html(int $videoId = -1){
+
             $nonce = wp_create_nonce('githubauthvideo_serve_video_' . $videoId);
             $videoUrl = '/?githubauthvideo_video=' . $videoId . '&nonce=' . $nonce;
             $location = get_post_meta( $videoId, 'githubauthvideo_video-location-uri', true );
+            $textContent = get_post_meta( $videoId, 'githubauthvideo_video-description', true );
+            
+            if(!isset($location) || $location == -1 || $location == ''){
+                return <<<EOT
+                <div class="githubvideoauth-video-text-content-container">
+                    $textContent
+                </div>
+            EOT;
+            }
             $mediaId = intval($location);
             if($mediaId){
                 //If using a media ID, get the file path
                 $location = get_attached_file($mediaId);
             }
-            $textContent = get_post_meta( $videoId, 'githubauthvideo_video-description', true );
+            
             $title = '';
             $post = get_post($videoId);
             if($post){
