@@ -125,28 +125,26 @@
                     echo 'Video file could not be found.';
                     exit;
                 }
-
                 foreach($server_headers as $header_name => $header_value){
                     header($header_name . ": " . $header_value);
                 }
                 
                 if($streamFile){
-                    $bytesToRead = 102400;
-                    $i = 0;
+                    $bytesToRead = 8192;
+                    $data = TRUE;
                     set_time_limit(5);
-                    while(!feof($handle) && $i <= $c_length) {
-                        if(($i+$bytesToRead) > $c_length) {
-                            $bytesToRead = $c_length - $i + 1;
-                        }
+                    while(!feof($handle) && $data) {
                         $data = fread($handle, $bytesToRead);
                         echo $data;
                         flush();
-                        $i += $bytesToRead;
+                        if (connection_aborted () != 0) {
+                            fclose($handle);
+                            die();
+                        }
                     }
                 } else {
                     fpassthru($handle);
                 }
-                
                 fclose($handle);
             }
         }
