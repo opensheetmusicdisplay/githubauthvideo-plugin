@@ -84,16 +84,18 @@
                 $stream->start();
             } else { //otherwise pass through from the URL
                 $request_headers_for_server = array(
-                    'Accept: video/*',
-                    'User-Agent: PHP',
                     'method: GET'
                 );
-                $streamFile = false;
-                $c_length = 0;
-                //If we are requesting a range, forward that
-                if(isset($_SERVER['HTTP_RANGE'])){
-                    $streamFile = true;
-                    array_push($request_headers_for_server, 'Range: ' . $_SERVER['HTTP_RANGE']);
+                $headers_from_client = getallheaders();
+                foreach($headers_from_client as $header_name => $header_value){
+                    switch(strtolower($header_name)){
+                        case 'host':
+                        case 'cookie':
+                        break;
+                        default:
+                            array_push($request_headers_for_server, $header_name . ': ' . $header_value);
+                        break;
+                    }
                 }
 
                 $options = array(
@@ -104,19 +106,21 @@
                 $context  = stream_context_create($options);
                 $server_headers = array_change_key_case(get_headers($location, TRUE, $context), CASE_LOWER);
                 if(isset($server_headers) && is_array($server_headers)){
-                    //Server doesn't accept ranges. Can't stream
-                    if(!array_key_exists('accept-ranges', $server_headers)){
-                        $streamFile = false;
-                    } else {
-                        if(array_key_exists('content-length', $server_headers)){
-                            $c_length = intval($server_headers['content-length']);
-                        }
-                    }
                     if(array_key_exists(0, $server_headers)){
                         header($server_headers[0]);
                         unset($server_headers[0]);
                     } else {
                         header('HTTP/1.0 200 OK'); 
+                    }
+                }
+
+                foreach($server_headers as $header_name => $header_value){
+                    if(is_array($header_value)){
+                        foreach($header_value as $subheader){
+                            header($header_name . ": " . $subheader);
+                        }
+                    } else {
+                        header($header_name . ": " . $header_value);
                     }
                 }
                 $handle = fopen($location, 'rb', false, $context);
@@ -125,25 +129,17 @@
                     echo 'Video file could not be found.';
                     exit;
                 }
-                foreach($server_headers as $header_name => $header_value){
-                    header($header_name . ": " . $header_value);
-                }
-                
-                if($streamFile){
-                    $bytesToRead = 8192;
-                    $data = TRUE;
-                    set_time_limit(5);
-                    while(!feof($handle) && $data) {
-                        $data = fread($handle, $bytesToRead);
-                        echo $data;
-                        flush();
-                        if (connection_aborted () != 0) {
-                            fclose($handle);
-                            die();
-                        }
+                $bytesToRead = 8192;
+                $data = TRUE;
+                set_time_limit(5);
+                while(!feof($handle) && $data) {
+                    $data = fread($handle, $bytesToRead);
+                    echo $data;
+                    flush();
+                    if (connection_aborted () != 0) {
+                        fclose($handle);
+                        die();
                     }
-                } else {
-                    fpassthru($handle);
                 }
                 fclose($handle);
             }
