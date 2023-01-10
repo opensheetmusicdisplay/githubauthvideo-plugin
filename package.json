@@ -7,7 +7,7 @@
 	"main": "build/index.js",
 	"scripts": {
 		"wp:build": "wp-scripts build",
-		"player:build": "webpack --progress --colors --config webpack.player.config.js",
+		"player:build": "webpack --progress --config webpack.player.config.js",
 		"build": "npm-run-all wp:build player:build",
 		"start": "wp-scripts start",
 		"format:js": "wp-scripts format-js",
@@ -16,7 +16,7 @@
 		"packages-update": "wp-scripts packages-update"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^12.5.0",
+		"@wordpress/scripts": "^25.1.0",
 		"npm-run-all": "4.1.5"
 	},
 	"dependencies": {

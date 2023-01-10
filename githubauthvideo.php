@@ -7,7 +7,7 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 /**
  * Plugin Name:     Authenticate Sponsorware Videos via GitHub
  * Description:     This plugin allows Wordpress users to put a video and description behind Github oauth prompt. It can optionally check for sponsorship of a given organization or user to allow access.
- * Version:         1.2.0
+ * Version:         1.2.2
  * Author:          opensheetmusicdisplay, fredmeister77, ranacseruet, jeremyhixon
  * License:         GPL-2.0-or-later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
@@ -147,7 +147,7 @@ function githubauthvideo_block_enqueue_js( ) {
 			'githubauthvideo-script',
 			esc_url( plugins_url( 'build/player/player.min.js', __FILE__ ) ),
 			array( ),
-			'1.1.0',
+			'1.1.1',
 			true
 		);
 
@@ -185,7 +185,7 @@ function githubauthvideo_enqueue_admin_assets($hook){
 			'githubauthvideo-admin-script',
 			esc_url( plugins_url( 'build/admin/settings.min.js', __FILE__ ) ),
 			array( ),
-			'0.5.0',
+			'0.5.1',
 			true
 		);
 	}

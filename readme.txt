@@ -3,8 +3,8 @@ Contributors:      opensheetmusicdisplay, fredmeister77, ranacseruet, jeremyhixo
 Donate link:       https://OSMD.org/Donate
 Tags:              block,github,video,sponsor,oauth
 Requires at least: 5.5.0
-Tested up to:      5.8.2
-Stable tag:        1.2.0
+Tested up to:      6.1.1
+Stable tag:        1.2.2
 Requires PHP:      7.0.0
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -136,6 +136,12 @@ Please reach out to us at: support@opensheetmusicdisplay.org if you have any iss
 7. This is the block editor for a post, showing the plugin's block being used (admin)
 
 == Changelog ==
+
+= 1.2.2 =
+*Testing on 6.1.1, update to the latest npm packages for security fixes, etc.
+
+= 1.2.1 =
+* Further fixes for proxy issues. *
 
 = 1.2.0 =
 * Fix proxy issues - Properly stream videos from a specified host.
